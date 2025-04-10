@@ -38,7 +38,7 @@ public class GPatentLibrary extends BaseEntity {
   /**
    * 专利类型
    */
-  @Excel(name = "专利类型")
+  @Excel(name = "专利类型", readConverterExp = "1=授权未缴费发明,2=下证发明,3=授权未缴费实用,4=下证实用")
   private String patentTypeKey;
 
   /**
@@ -56,7 +56,7 @@ public class GPatentLibrary extends BaseEntity {
    * 缴费日期
    */
   @JsonFormat(pattern = "yyyy-MM-dd")
-  @Excel(name = "缴费日期", width = 30, dateFormat = "yyyy-MM-dd")
+  @Excel(name = "缴费日期")
   private Date feeDate;
 
   /**
@@ -68,6 +68,7 @@ public class GPatentLibrary extends BaseEntity {
   /**
    * 是否报过高企
    */
+  @Excel(name = "是否报过高企", readConverterExp = "Y=是,N=否")
   private String highTechReportedKey;
 
   /**
@@ -84,7 +85,6 @@ public class GPatentLibrary extends BaseEntity {
   /**
    * 状态
    */
-  @Excel(name = "状态")
   private String statusKey;
 
   /**
@@ -95,7 +95,6 @@ public class GPatentLibrary extends BaseEntity {
   /**
    * 预定人
    */
-  @Excel(name = "预定人")
   private String bookerKey;
 
   /**
@@ -106,13 +105,28 @@ public class GPatentLibrary extends BaseEntity {
   /**
    * 天数
    */
-  @Excel(name = "天数")
   private Long days;
 
   /**
    * 截止日期
    */
   private Date deadline;
+
+  /**
+   * 预定状态
+   */
+  private Integer reserveStatus;
+
+  public Integer getReserveStatus() {
+    return reserveStatus;
+  }
+
+  public void setReserveStatus(Integer reserveStatus) {
+    this.reserveStatus = reserveStatus;
+  }
+
+  @Excel(name = "备注")
+  private String remark;
 
   public void setId(Long id) {
     this.id = id;
@@ -248,6 +262,16 @@ public class GPatentLibrary extends BaseEntity {
 
   public Date getDeadline() {
     return deadline;
+  }
+
+  @Override
+  public String getRemark() {
+    return remark;
+  }
+
+  @Override
+  public void setRemark(String remark) {
+    this.remark = remark;
   }
 
   @Override

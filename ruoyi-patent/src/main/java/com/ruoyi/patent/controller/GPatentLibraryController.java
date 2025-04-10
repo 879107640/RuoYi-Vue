@@ -3,6 +3,8 @@ package com.ruoyi.patent.controller;
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
+import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.common.core.domain.model.LoginUser;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +23,7 @@ import com.ruoyi.patent.domain.GPatentLibrary;
 import com.ruoyi.patent.service.IGPatentLibraryService;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 专利库数据Controller
@@ -95,4 +98,31 @@ public class GPatentLibraryController extends BaseController {
   public AjaxResult remove(@PathVariable Long[] ids) {
     return toAjax(gPatentLibraryService.deleteGPatentLibraryByIds(ids));
   }
+
+  @Log(title = "专利导入", businessType = BusinessType.IMPORT)
+  @PostMapping("/importData")
+  public AjaxResult importData(MultipartFile file, boolean updateSupport) throws Exception {
+    ExcelUtil<GPatentLibrary> util = new ExcelUtil<>(GPatentLibrary.class);
+    List<GPatentLibrary> gPatentLibraries = util.importExcel(file.getInputStream());
+    String message = gPatentLibraryService.importGPatentLibrary(gPatentLibraries, updateSupport);
+    return success(message);
+  }
+
+  @PostMapping("/importTemplate")
+  public void importTemplate(HttpServletResponse response) {
+    ExcelUtil<GPatentLibrary> util = new ExcelUtil<>(GPatentLibrary.class);
+    util.importTemplateExcel(response, "专利模版");
+  }
+
+  /**
+   * 预定
+   * @param id
+   */
+  @PutMapping("/reserve/{id}")
+  public void reserve(@PathVariable("id") String id) {
+    LoginUser loginUser = getLoginUser();
+    gPatentLibraryService.reserve(id, loginUser);
+
+  }
+
 }

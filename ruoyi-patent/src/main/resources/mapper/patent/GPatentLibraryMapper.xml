@@ -49,6 +49,9 @@
     <include refid="selectGPatentLibraryVo"/>
     where id = #{id}
   </select>
+  <select id="selectGPatentLibraryByNo" resultType="com.ruoyi.patent.domain.GPatentLibrary">
+    select * from g_patent_library where patent_no = #{patentNo}
+  </select>
 
   <insert id="insertGPatentLibrary" parameterType="GPatentLibrary" useGeneratedKeys="true" keyProperty="id">
     insert into g_patent_library

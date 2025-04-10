@@ -3,6 +3,7 @@ package com.ruoyi.patent.mapper;
 import java.util.List;
 
 import com.ruoyi.patent.domain.GPatentLibrary;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 专利库数据Mapper接口
@@ -58,4 +59,6 @@ public interface GPatentLibraryMapper {
    * @return 结果
    */
   public int deleteGPatentLibraryByIds(Long[] ids);
+
+  GPatentLibrary selectGPatentLibraryByNo(@Param("patentNo") String patentNo);
 }

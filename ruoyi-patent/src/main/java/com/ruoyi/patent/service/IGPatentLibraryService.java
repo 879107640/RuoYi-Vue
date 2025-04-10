@@ -2,6 +2,7 @@ package com.ruoyi.patent.service;
 
 import java.util.List;
 
+import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.patent.domain.GPatentLibrary;
 
 /**
@@ -58,4 +59,9 @@ public interface IGPatentLibraryService {
    * @return 结果
    */
   public int deleteGPatentLibraryById(Long id);
+
+  String importGPatentLibrary(List<GPatentLibrary> gPatentLibraries, boolean updateSupport);
+
+  void reserve(String id, LoginUser loginUser);
+
 }

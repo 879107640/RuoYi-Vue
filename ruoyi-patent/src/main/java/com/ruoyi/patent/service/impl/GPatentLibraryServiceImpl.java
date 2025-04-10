@@ -1,8 +1,11 @@
 package com.ruoyi.patent.service.impl;
 
 import java.util.List;
+import java.util.Objects;
 
+import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.common.utils.bean.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.patent.mapper.GPatentLibraryMapper;
@@ -86,5 +89,25 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
   @Override
   public int deleteGPatentLibraryById(Long id) {
     return gPatentLibraryMapper.deleteGPatentLibraryById(id);
+  }
+
+  @Override
+  public String importGPatentLibrary(List<GPatentLibrary> gPatentLibraries, boolean updateSupport) {
+    for (GPatentLibrary gPatentLibrary : gPatentLibraries) {
+      GPatentLibrary oldGPatentLibrary = gPatentLibraryMapper.selectGPatentLibraryByNo(gPatentLibrary.getPatentNo());
+      if (Objects.nonNull(oldGPatentLibrary) && updateSupport) {
+        gPatentLibrary.setId(oldGPatentLibrary.getId());
+        gPatentLibraryMapper.updateGPatentLibrary(gPatentLibrary);
+        continue;
+      }
+      gPatentLibraryMapper.insertGPatentLibrary(gPatentLibrary);
+    }
+
+    return "导入成功";
+  }
+
+  @Override
+  public void reserve(String id, LoginUser loginUser) {
+    gPatentLibraryMapper.selectGPatentLibraryById(Long.valueOf(id));
   }
 }

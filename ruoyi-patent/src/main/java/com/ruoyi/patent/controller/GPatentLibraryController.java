@@ -2,6 +2,9 @@ package com.ruoyi.patent.controller;
 
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
+
+import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.common.core.domain.model.LoginUser;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,81 +23,106 @@ import com.ruoyi.patent.domain.GPatentLibrary;
 import com.ruoyi.patent.service.IGPatentLibraryService;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 专利库数据Controller
- * 
+ *
  * @author hujch
  * @date 2025-04-10
  */
 @RestController
 @RequestMapping("/patent/library")
 public class GPatentLibraryController extends BaseController {
+  @Autowired
+  private IGPatentLibraryService gPatentLibraryService;
 
-    @Autowired
-    private IGPatentLibraryService gPatentLibraryService;
+  /**
+   * 查询专利库数据列表
+   */
+  @PreAuthorize("@ss.hasPermi('patent:library:list')")
+  @GetMapping("/list")
+  public TableDataInfo list(GPatentLibrary gPatentLibrary) {
+    startPage();
+    List<GPatentLibrary> list = gPatentLibraryService.selectGPatentLibraryList(gPatentLibrary);
+    return getDataTable(list);
+  }
 
-    /**
-     * 查询专利库数据列表
-     */
-    /*@PreAuthorize("@ss.hasPermi('patent:library:list')")*/
-    @GetMapping("/list")
-    public TableDataInfo list(GPatentLibrary gPatentLibrary,int type) {
-        startPage();
-        List<GPatentLibrary> list = gPatentLibraryService.selectGPatentLibraryList(gPatentLibrary,type);
-        return getDataTable(list);
-    }
+  /**
+   * 导出专利库数据列表
+   */
+  @PreAuthorize("@ss.hasPermi('patent:library:export')")
+  @Log(title = "专利库数据", businessType = BusinessType.EXPORT)
+  @PostMapping("/export")
+  public void export(HttpServletResponse response, GPatentLibrary gPatentLibrary) {
+    List<GPatentLibrary> list = gPatentLibraryService.selectGPatentLibraryList(gPatentLibrary);
+    ExcelUtil<GPatentLibrary> util = new ExcelUtil<GPatentLibrary>(GPatentLibrary.class);
+    util.exportExcel(response, list, "专利库数据数据");
+  }
 
-    /**
-     * 导出专利库数据列表
-     */
-    /*@PreAuthorize("@ss.hasPermi('patent:library:export')")*/
-    @Log(title = "专利库数据", businessType = BusinessType.EXPORT)
-    @PostMapping("/export")
-    public void export(HttpServletResponse response, GPatentLibrary gPatentLibrary,int type) {
-        List<GPatentLibrary> list = gPatentLibraryService.selectGPatentLibraryList(gPatentLibrary,type);
-        ExcelUtil<GPatentLibrary> util = new ExcelUtil<GPatentLibrary>(GPatentLibrary.class);
-        util.exportExcel(response, list, "专利库数据数据");
-    }
+  /**
+   * 获取专利库数据详细信息
+   */
+  @PreAuthorize("@ss.hasPermi('patent:library:query')")
+  @GetMapping(value = "/{id}")
+  public AjaxResult getInfo(@PathVariable("id") Long id) {
+    return success(gPatentLibraryService.selectGPatentLibraryById(id));
+  }
 
-    /**
-     * 获取专利库数据详细信息
-     */
-    /*@PreAuthorize("@ss.hasPermi('patent:library:query')")*/
-    @GetMapping(value = "/{id}")
-    public AjaxResult getInfo(@PathVariable("id") String id) {
-        return success(gPatentLibraryService.selectGPatentLibraryById(id));
-    }
+  /**
+   * 新增专利库数据
+   */
+  @PreAuthorize("@ss.hasPermi('patent:library:add')")
+  @Log(title = "专利库数据", businessType = BusinessType.INSERT)
+  @PostMapping
+  public AjaxResult add(@RequestBody GPatentLibrary gPatentLibrary) {
+    return toAjax(gPatentLibraryService.insertGPatentLibrary(gPatentLibrary));
+  }
 
-    /**
-     * 新增专利库数据
-     */
-    /*@PreAuthorize("@ss.hasPermi('patent:library:add')")*/
-    @Log(title = "专利库数据", businessType = BusinessType.INSERT)
-    @PostMapping
-    public AjaxResult add(@RequestBody GPatentLibrary gPatentLibrary) {
-        return toAjax(gPatentLibraryService.insertGPatentLibrary(gPatentLibrary));
-    }
+  /**
+   * 修改专利库数据
+   */
+  @PreAuthorize("@ss.hasPermi('patent:library:edit')")
+  @Log(title = "专利库数据", businessType = BusinessType.UPDATE)
+  @PutMapping
+  public AjaxResult edit(@RequestBody GPatentLibrary gPatentLibrary) {
+    return toAjax(gPatentLibraryService.updateGPatentLibrary(gPatentLibrary));
+  }
 
-    /**
-     * 修改专利库数据
-     */
-    /*@PreAuthorize("@ss.hasPermi('patent:library:edit')")*/
-    @Log(title = "专利库数据", businessType = BusinessType.UPDATE)
-    @PutMapping
-    public AjaxResult edit(@RequestBody GPatentLibrary gPatentLibrary) {
-        return toAjax(gPatentLibraryService.updateGPatentLibrary(gPatentLibrary));
-    }
+  /**
+   * 删除专利库数据
+   */
+  @PreAuthorize("@ss.hasPermi('patent:library:remove')")
+  @Log(title = "专利库数据", businessType = BusinessType.DELETE)
+  @DeleteMapping("/{ids}")
+  public AjaxResult remove(@PathVariable Long[] ids) {
+    return toAjax(gPatentLibraryService.deleteGPatentLibraryByIds(ids));
+  }
 
-    /**
-     * 删除专利库数据
-     */
-    /*@PreAuthorize("@ss.hasPermi('patent:library:remove')")*/
-    @Log(title = "专利库数据", businessType = BusinessType.DELETE)
-	@DeleteMapping("/{ids}")
-    public AjaxResult remove(@PathVariable String[] ids) {
-        return toAjax(gPatentLibraryService.deleteGPatentLibraryByIds(ids));
-    }
+  @Log(title = "专利导入", businessType = BusinessType.IMPORT)
+  @PostMapping("/importData")
+  public AjaxResult importData(MultipartFile file, boolean updateSupport) throws Exception {
+    ExcelUtil<GPatentLibrary> util = new ExcelUtil<>(GPatentLibrary.class);
+    List<GPatentLibrary> gPatentLibraries = util.importExcel(file.getInputStream());
+    String message = gPatentLibraryService.importGPatentLibrary(gPatentLibraries, updateSupport);
+    return success(message);
+  }
 
+  @PostMapping("/importTemplate")
+  public void importTemplate(HttpServletResponse response) {
+    ExcelUtil<GPatentLibrary> util = new ExcelUtil<>(GPatentLibrary.class);
+    util.importTemplateExcel(response, "专利模版");
+  }
+
+  /**
+   * 预定
+   * @param id
+   */
+  @PutMapping("/reserve/{id}")
+  public void reserve(@PathVariable("id") String id) {
+    LoginUser loginUser = getLoginUser();
+    gPatentLibraryService.reserve(id, loginUser);
+
+  }
 
 }

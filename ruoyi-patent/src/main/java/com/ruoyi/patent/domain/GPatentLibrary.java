@@ -2,6 +2,7 @@ package com.ruoyi.patent.domain;
 
 import java.math.BigDecimal;
 import java.util.Date;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -10,269 +11,292 @@ import com.ruoyi.common.core.domain.BaseEntity;
 
 /**
  * 专利库数据对象 g_patent_library
- * 
+ *
  * @author hujch
  * @date 2025-04-10
  */
-public class GPatentLibrary extends BaseEntity
-{
-    private static final long serialVersionUID = 1L;
+public class GPatentLibrary extends BaseEntity {
+  private static final long serialVersionUID = 1L;
 
-    /** 主键ID */
-    private String id;
+  /**
+   * 主键ID
+   */
+  private Long id;
 
-    /** 专利号 */
-    @Excel(name = "专利号")
-    private String patentNo;
+  /**
+   * 专利号
+   */
+  @Excel(name = "专利号")
+  private String patentNo;
 
-    /** 专利名称 */
-    @Excel(name = "专利名称")
-    private String patentName;
+  /**
+   * 专利名称
+   */
+  @Excel(name = "专利名称")
+  private String patentName;
 
-    /** 专利类型 */
-    @Excel(name = "专利类型")
-    private String patentTypeKey;
+  /**
+   * 专利类型
+   */
+  @Excel(name = "专利类型", readConverterExp = "1=授权未缴费发明,2=下证发明,3=授权未缴费实用,4=下证实用")
+  private String patentTypeKey;
 
-    /** 专利类型值 */
-    private Integer patentTypeValue;
+  /**
+   * 专利类型值
+   */
+  private Integer patentTypeValue;
 
-    /** 领域 */
-    @Excel(name = "领域")
-    private String domain;
+  /**
+   * 领域
+   */
+  @Excel(name = "领域")
+  private String domain;
 
-    /** 缴费日期 */
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    @Excel(name = "缴费日期", width = 30, dateFormat = "yyyy-MM-dd")
-    private Date feeDate;
+  /**
+   * 缴费日期
+   */
+  @JsonFormat(pattern = "yyyy-MM-dd")
+  @Excel(name = "缴费日期")
+  private Date feeDate;
 
-    /** 指导价 */
-    @Excel(name = "指导价")
-    private BigDecimal guidancePrice;
+  /**
+   * 指导价
+   */
+  @Excel(name = "指导价")
+  private BigDecimal guidancePrice;
 
-    /** 是否报过高企 */
-    private String highTechReportedKey;
+  /**
+   * 是否报过高企
+   */
+  @Excel(name = "是否报过高企", readConverterExp = "Y=是,N=否")
+  private String highTechReportedKey;
 
-    /** 是否报过高企值 */
-    private Integer highTechReportedValue;
+  /**
+   * 是否报过高企值
+   */
+  private Integer highTechReportedValue;
 
-    /** 资源方 */
-    @Excel(name = "资源方")
-    private String resourceProvider;
+  /**
+   * 资源方
+   */
+  @Excel(name = "资源方")
+  private String resourceProvider;
 
-    /** 状态 */
-    @Excel(name = "状态")
-    private String statusKey;
+  /**
+   * 状态
+   */
+  private String statusKey;
 
-    /** 状态 */
-    private Integer statusValue;
+  /**
+   * 状态
+   */
+  private Integer statusValue;
 
-    /** 预定人 */
-    @Excel(name = "预定人")
-    private String bookerKey;
+  /**
+   * 预定人
+   */
+  private String bookerKey;
 
-    /** 预定人值 */
-    private String bookerValue;
+  /**
+   * 预定人值
+   */
+  private String bookerValue;
 
-    /** 天数 */
-    @Excel(name = "天数")
-    private Long days;
+  /**
+   * 天数
+   */
+  private Long days;
 
-    /** 截止日期 */
-    private Date deadline;
+  /**
+   * 截止日期
+   */
+  private Date deadline;
 
-    public void setId(String id)
-    {
-        this.id = id;
-    }
+  /**
+   * 预定状态
+   */
+  private Integer reserveStatus;
 
-    public String getId()
-    {
-        return id;
-    }
+  public Integer getReserveStatus() {
+    return reserveStatus;
+  }
 
-    public void setPatentNo(String patentNo) 
-    {
-        this.patentNo = patentNo;
-    }
+  public void setReserveStatus(Integer reserveStatus) {
+    this.reserveStatus = reserveStatus;
+  }
 
-    public String getPatentNo() 
-    {
-        return patentNo;
-    }
+  @Excel(name = "备注")
+  private String remark;
 
-    public void setPatentName(String patentName) 
-    {
-        this.patentName = patentName;
-    }
+  public void setId(Long id) {
+    this.id = id;
+  }
 
-    public String getPatentName() 
-    {
-        return patentName;
-    }
+  public Long getId() {
+    return id;
+  }
 
-    public void setPatentTypeKey(String patentTypeKey) 
-    {
-        this.patentTypeKey = patentTypeKey;
-    }
+  public void setPatentNo(String patentNo) {
+    this.patentNo = patentNo;
+  }
 
-    public String getPatentTypeKey() 
-    {
-        return patentTypeKey;
-    }
+  public String getPatentNo() {
+    return patentNo;
+  }
 
-    public void setPatentTypeValue(Integer patentTypeValue) 
-    {
-        this.patentTypeValue = patentTypeValue;
-    }
+  public void setPatentName(String patentName) {
+    this.patentName = patentName;
+  }
 
-    public Integer getPatentTypeValue() 
-    {
-        return patentTypeValue;
-    }
+  public String getPatentName() {
+    return patentName;
+  }
 
-    public void setDomain(String domain) 
-    {
-        this.domain = domain;
-    }
+  public void setPatentTypeKey(String patentTypeKey) {
+    this.patentTypeKey = patentTypeKey;
+  }
 
-    public String getDomain() 
-    {
-        return domain;
-    }
+  public String getPatentTypeKey() {
+    return patentTypeKey;
+  }
 
-    public void setFeeDate(Date feeDate) 
-    {
-        this.feeDate = feeDate;
-    }
+  public void setPatentTypeValue(Integer patentTypeValue) {
+    this.patentTypeValue = patentTypeValue;
+  }
 
-    public Date getFeeDate() 
-    {
-        return feeDate;
-    }
+  public Integer getPatentTypeValue() {
+    return patentTypeValue;
+  }
 
-    public void setGuidancePrice(BigDecimal guidancePrice) 
-    {
-        this.guidancePrice = guidancePrice;
-    }
+  public void setDomain(String domain) {
+    this.domain = domain;
+  }
 
-    public BigDecimal getGuidancePrice() 
-    {
-        return guidancePrice;
-    }
+  public String getDomain() {
+    return domain;
+  }
 
-    public void setHighTechReportedKey(String highTechReportedKey) 
-    {
-        this.highTechReportedKey = highTechReportedKey;
-    }
+  public void setFeeDate(Date feeDate) {
+    this.feeDate = feeDate;
+  }
 
-    public String getHighTechReportedKey() 
-    {
-        return highTechReportedKey;
-    }
+  public Date getFeeDate() {
+    return feeDate;
+  }
 
-    public void setHighTechReportedValue(Integer highTechReportedValue) 
-    {
-        this.highTechReportedValue = highTechReportedValue;
-    }
+  public void setGuidancePrice(BigDecimal guidancePrice) {
+    this.guidancePrice = guidancePrice;
+  }
 
-    public Integer getHighTechReportedValue() 
-    {
-        return highTechReportedValue;
-    }
+  public BigDecimal getGuidancePrice() {
+    return guidancePrice;
+  }
 
-    public void setResourceProvider(String resourceProvider) 
-    {
-        this.resourceProvider = resourceProvider;
-    }
+  public void setHighTechReportedKey(String highTechReportedKey) {
+    this.highTechReportedKey = highTechReportedKey;
+  }
 
-    public String getResourceProvider() 
-    {
-        return resourceProvider;
-    }
+  public String getHighTechReportedKey() {
+    return highTechReportedKey;
+  }
 
-    public void setStatusKey(String statusKey) 
-    {
-        this.statusKey = statusKey;
-    }
+  public void setHighTechReportedValue(Integer highTechReportedValue) {
+    this.highTechReportedValue = highTechReportedValue;
+  }
 
-    public String getStatusKey() 
-    {
-        return statusKey;
-    }
+  public Integer getHighTechReportedValue() {
+    return highTechReportedValue;
+  }
 
-    public void setStatusValue(Integer statusValue) 
-    {
-        this.statusValue = statusValue;
-    }
+  public void setResourceProvider(String resourceProvider) {
+    this.resourceProvider = resourceProvider;
+  }
 
-    public Integer getStatusValue() 
-    {
-        return statusValue;
-    }
+  public String getResourceProvider() {
+    return resourceProvider;
+  }
 
-    public void setBookerKey(String bookerKey) 
-    {
-        this.bookerKey = bookerKey;
-    }
+  public void setStatusKey(String statusKey) {
+    this.statusKey = statusKey;
+  }
 
-    public String getBookerKey() 
-    {
-        return bookerKey;
-    }
+  public String getStatusKey() {
+    return statusKey;
+  }
 
-    public void setBookerValue(String bookerValue) 
-    {
-        this.bookerValue = bookerValue;
-    }
+  public void setStatusValue(Integer statusValue) {
+    this.statusValue = statusValue;
+  }
 
-    public String getBookerValue() 
-    {
-        return bookerValue;
-    }
+  public Integer getStatusValue() {
+    return statusValue;
+  }
 
-    public void setDays(Long days) 
-    {
-        this.days = days;
-    }
+  public void setBookerKey(String bookerKey) {
+    this.bookerKey = bookerKey;
+  }
 
-    public Long getDays() 
-    {
-        return days;
-    }
+  public String getBookerKey() {
+    return bookerKey;
+  }
 
-    public void setDeadline(Date deadline) 
-    {
-        this.deadline = deadline;
-    }
+  public void setBookerValue(String bookerValue) {
+    this.bookerValue = bookerValue;
+  }
 
-    public Date getDeadline() 
-    {
-        return deadline;
-    }
+  public String getBookerValue() {
+    return bookerValue;
+  }
 
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
-            .append("id", getId())
-            .append("patentNo", getPatentNo())
-            .append("patentName", getPatentName())
-            .append("patentTypeKey", getPatentTypeKey())
-            .append("patentTypeValue", getPatentTypeValue())
-            .append("domain", getDomain())
-            .append("feeDate", getFeeDate())
-            .append("guidancePrice", getGuidancePrice())
-            .append("highTechReportedKey", getHighTechReportedKey())
-            .append("highTechReportedValue", getHighTechReportedValue())
-            .append("resourceProvider", getResourceProvider())
-            .append("remark", getRemark())
-            .append("statusKey", getStatusKey())
-            .append("statusValue", getStatusValue())
-            .append("bookerKey", getBookerKey())
-            .append("bookerValue", getBookerValue())
-            .append("days", getDays())
-            .append("deadline", getDeadline())
-            .append("createTime", getCreateTime())
-            .append("updateTime", getUpdateTime())
-            .toString();
-    }
+  public void setDays(Long days) {
+    this.days = days;
+  }
+
+  public Long getDays() {
+    return days;
+  }
+
+  public void setDeadline(Date deadline) {
+    this.deadline = deadline;
+  }
+
+  public Date getDeadline() {
+    return deadline;
+  }
+
+  @Override
+  public String getRemark() {
+    return remark;
+  }
+
+  @Override
+  public void setRemark(String remark) {
+    this.remark = remark;
+  }
+
+  @Override
+  public String toString() {
+    return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
+        .append("id", getId())
+        .append("patentNo", getPatentNo())
+        .append("patentName", getPatentName())
+        .append("patentTypeKey", getPatentTypeKey())
+        .append("patentTypeValue", getPatentTypeValue())
+        .append("domain", getDomain())
+        .append("feeDate", getFeeDate())
+        .append("guidancePrice", getGuidancePrice())
+        .append("highTechReportedKey", getHighTechReportedKey())
+        .append("highTechReportedValue", getHighTechReportedValue())
+        .append("resourceProvider", getResourceProvider())
+        .append("remark", getRemark())
+        .append("statusKey", getStatusKey())
+        .append("statusValue", getStatusValue())
+        .append("bookerKey", getBookerKey())
+        .append("bookerValue", getBookerValue())
+        .append("days", getDays())
+        .append("deadline", getDeadline())
+        .append("createTime", getCreateTime())
+        .append("updateTime", getUpdateTime())
+        .toString();
+  }
 }

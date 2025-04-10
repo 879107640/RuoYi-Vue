@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.patent.mapper.GPurchaseRecommendMapper">
+
+  <resultMap type="GPurchaseRecommend" id="GPurchaseRecommendResult">
+        <result property="id" column="id"/>
+        <result property="purchaseId" column="purchase_id"/>
+        <result property="patentId" column="patent_id"/>
+        <result property="patentNo" column="patent_no"/>
+        <result property="patentName" column="patent_name"/>
+        <result property="guidancePrice" column="guidance_price"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateBy" column="update_by"/>
+  </resultMap>
+
+  <sql id="selectGPurchaseRecommendVo">
+      select id, purchase_id, patent_id, patent_no, patent_name, guidance_price, create_time, update_time, create_by, update_by
+      from g_purchase_recommend
+  </sql>
+
+  <select id="selectGPurchaseRecommendList" parameterType="GPurchaseRecommend" resultMap="GPurchaseRecommendResult">
+    <include refid="selectGPurchaseRecommendVo"/>
+    <where>
+    </where>
+  </select>
+
+  <select id="selectGPurchaseRecommendById" parameterType="String"
+          resultMap="GPurchaseRecommendResult">
+        <include refid="selectGPurchaseRecommendVo"/>
+        where id = #{id}
+  </select>
+
+  <insert id="insertGPurchaseRecommend" parameterType="GPurchaseRecommend">
+    insert into g_purchase_recommend
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+              <if test="id != null">id,</if>
+              <if test="purchaseId != null and purchaseId != ''">purchase_id,</if>
+              <if test="patentId != null and patentId != ''">patent_id,</if>
+              <if test="patentNo != null and patentNo != ''">patent_no,</if>
+              <if test="patentName != null and patentName != ''">patent_name,</if>
+              <if test="guidancePrice != null">guidance_price,</if>
+              <if test="createTime != null">create_time,</if>
+              <if test="updateTime != null">update_time,</if>
+              <if test="createBy != null">create_by,</if>
+              <if test="updateBy != null">update_by,</if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+              <if test="id != null">#{id},</if>
+              <if test="purchaseId != null and purchaseId != ''">#{purchaseId},</if>
+              <if test="patentId != null and patentId != ''">#{patentId},</if>
+              <if test="patentNo != null and patentNo != ''">#{patentNo},</if>
+              <if test="patentName != null and patentName != ''">#{patentName},</if>
+              <if test="guidancePrice != null">#{guidancePrice},</if>
+              <if test="createTime != null">#{createTime},</if>
+              <if test="updateTime != null">#{updateTime},</if>
+              <if test="createBy != null">#{createBy},</if>
+              <if test="updateBy != null">#{updateBy},</if>
+    </trim>
+  </insert>
+
+  <update id="updateGPurchaseRecommend" parameterType="GPurchaseRecommend">
+    update g_purchase_recommend
+    <trim prefix="SET" suffixOverrides=",">
+              <if test="purchaseId != null and purchaseId != ''">purchase_id = #{purchaseId},
+              </if>
+              <if test="patentId != null and patentId != ''">patent_id = #{patentId},
+              </if>
+              <if test="patentNo != null and patentNo != ''">patent_no = #{patentNo},
+              </if>
+              <if test="patentName != null and patentName != ''">patent_name = #{patentName},
+              </if>
+              <if test="guidancePrice != null">guidance_price = #{guidancePrice},
+              </if>
+              <if test="createTime != null">create_time = #{createTime},
+              </if>
+              <if test="updateTime != null">update_time = #{updateTime},
+              </if>
+              <if test="createBy != null">create_by = #{createBy},
+              </if>
+              <if test="updateBy != null">update_by = #{updateBy},
+              </if>
+    </trim>
+    where id = #{id}
+  </update>
+
+  <delete id="deleteGPurchaseRecommendById" parameterType="String">
+      delete
+      from g_purchase_recommend where id = #{id}
+  </delete>
+
+  <delete id="deleteGPurchaseRecommendByIds" parameterType="String">
+    delete from g_purchase_recommend where id in
+    <foreach item="id" collection="array" open="(" separator="," close=")">
+      #{id}
+    </foreach>
+  </delete>
+</mapper>

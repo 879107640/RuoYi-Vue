@@ -66,7 +66,7 @@ public interface GPatenLibraryLineUpMapper {
    * @param patentId 专利id
    * @return 结果
    */
-  int decrementQueueNumber(@Param("patentId") String patentId, @Param("lineUpNum") int lineUpNum);
+  int decrementQueueNumber(@Param("patentId") String patentId, @Param("lineUpNum") Long lineUpNum);
 
   /**
    * 删除指定用户和专利的排队记录

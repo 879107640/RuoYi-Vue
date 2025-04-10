@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.patent.mapper.GPurchaseRequestMapper">
+
+  <resultMap type="GPurchaseRequest" id="GPurchaseRequestResult">
+        <result property="id" column="id"/>
+        <result property="info" column="info"/>
+        <result property="recommendCount" column="recommend_count"/>
+        <result property="publishTime" column="publish_time"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateBy" column="update_by"/>
+  </resultMap>
+
+  <sql id="selectGPurchaseRequestVo">
+      select id, info, recommend_count, publish_time, create_time, update_time, create_by, update_by
+      from g_purchase_request
+  </sql>
+
+  <select id="selectGPurchaseRequestList" parameterType="GPurchaseRequest" resultMap="GPurchaseRequestResult">
+    <include refid="selectGPurchaseRequestVo"/>
+    <where>
+                  <if test="info != null  and info != ''">and info like concat('%', #{info}, '%')</if>
+    </where>
+  </select>
+
+  <select id="selectGPurchaseRequestById" parameterType="String"
+          resultMap="GPurchaseRequestResult">
+        <include refid="selectGPurchaseRequestVo"/>
+        where id = #{id}
+  </select>
+
+  <insert id="insertGPurchaseRequest" parameterType="GPurchaseRequest">
+    insert into g_purchase_request
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+              <if test="id != null">id,</if>
+              <if test="info != null and info != ''">info,</if>
+              <if test="recommendCount != null">recommend_count,</if>
+              <if test="publishTime != null">publish_time,</if>
+              <if test="createTime != null">create_time,</if>
+              <if test="updateTime != null">update_time,</if>
+              <if test="createBy != null">create_by,</if>
+              <if test="updateBy != null">update_by,</if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+              <if test="id != null">#{id},</if>
+              <if test="info != null and info != ''">#{info},</if>
+              <if test="recommendCount != null">#{recommendCount},</if>
+              <if test="publishTime != null">#{publishTime},</if>
+              <if test="createTime != null">#{createTime},</if>
+              <if test="updateTime != null">#{updateTime},</if>
+              <if test="createBy != null">#{createBy},</if>
+              <if test="updateBy != null">#{updateBy},</if>
+    </trim>
+  </insert>
+
+  <update id="updateGPurchaseRequest" parameterType="GPurchaseRequest">
+    update g_purchase_request
+    <trim prefix="SET" suffixOverrides=",">
+              <if test="info != null and info != ''">info = #{info},
+              </if>
+              <if test="recommendCount != null">recommend_count = #{recommendCount},
+              </if>
+              <if test="publishTime != null">publish_time = #{publishTime},
+              </if>
+              <if test="createTime != null">create_time = #{createTime},
+              </if>
+              <if test="updateTime != null">update_time = #{updateTime},
+              </if>
+              <if test="createBy != null">create_by = #{createBy},
+              </if>
+              <if test="updateBy != null">update_by = #{updateBy},
+              </if>
+    </trim>
+    where id = #{id}
+  </update>
+
+  <delete id="deleteGPurchaseRequestById" parameterType="String">
+      delete
+      from g_purchase_request where id = #{id}
+  </delete>
+
+  <delete id="deleteGPurchaseRequestByIds" parameterType="String">
+    delete from g_purchase_request where id in
+    <foreach item="id" collection="array" open="(" separator="," close=")">
+      #{id}
+    </foreach>
+  </delete>
+</mapper>

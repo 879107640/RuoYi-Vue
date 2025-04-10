@@ -75,7 +75,7 @@ public class GPatenLibraryLineUp extends BaseEntity {
         this.lineUpNum = lineUpNum;
     }
 
-    public int getLineUpNum() {
+    public Long getLineUpNum() {
         return lineUpNum;
     }
 

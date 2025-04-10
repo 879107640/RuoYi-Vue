@@ -3,6 +3,7 @@ package com.ruoyi.patent.service.impl;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.common.utils.uuid.UUID;
 import com.ruoyi.patent.domain.GPatenLibraryLineUp;
 import com.ruoyi.patent.domain.GPatentLibrary;
 import com.ruoyi.patent.mapper.GPatenLibraryLineUpMapper;
@@ -61,6 +62,7 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
   @Override
   public int insertGPatentLibrary(GPatentLibrary gPatentLibrary) {
     gPatentLibrary.setCreateTime(DateUtils.getNowDate());
+    gPatentLibrary.setId(UUID.randomUUID().toString());
     return gPatentLibraryMapper.insertGPatentLibrary(gPatentLibrary);
   }
 

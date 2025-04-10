@@ -30,7 +30,7 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
    * @return 专利库数据
    */
   @Override
-  public GPatentLibrary selectGPatentLibraryById(Long id) {
+  public GPatentLibrary selectGPatentLibraryById(String id) {
     return gPatentLibraryMapper.selectGPatentLibraryById(id);
   }
 
@@ -76,7 +76,7 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
    * @return 结果
    */
   @Override
-  public int deleteGPatentLibraryByIds(Long[] ids) {
+  public int deleteGPatentLibraryByIds(String[] ids) {
     return gPatentLibraryMapper.deleteGPatentLibraryByIds(ids);
   }
 
@@ -87,7 +87,7 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
    * @return 结果
    */
   @Override
-  public int deleteGPatentLibraryById(Long id) {
+  public int deleteGPatentLibraryById(String id) {
     return gPatentLibraryMapper.deleteGPatentLibraryById(id);
   }
 
@@ -108,6 +108,6 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
 
   @Override
   public void reserve(String id, LoginUser loginUser) {
-    gPatentLibraryMapper.selectGPatentLibraryById(Long.valueOf(id));
+    gPatentLibraryMapper.selectGPatentLibraryById(id);
   }
 }

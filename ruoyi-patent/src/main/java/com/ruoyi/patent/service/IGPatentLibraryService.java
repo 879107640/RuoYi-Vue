@@ -18,7 +18,7 @@ public interface IGPatentLibraryService {
    * @param id 专利库数据主键
    * @return 专利库数据
    */
-  public GPatentLibrary selectGPatentLibraryById(Long id);
+  public GPatentLibrary selectGPatentLibraryById(String id);
 
   /**
    * 查询专利库数据列表
@@ -50,7 +50,7 @@ public interface IGPatentLibraryService {
    * @param ids 需要删除的专利库数据主键集合
    * @return 结果
    */
-  public int deleteGPatentLibraryByIds(Long[] ids);
+  public int deleteGPatentLibraryByIds(String[] ids);
 
   /**
    * 删除专利库数据信息
@@ -58,7 +58,7 @@ public interface IGPatentLibraryService {
    * @param id 专利库数据主键
    * @return 结果
    */
-  public int deleteGPatentLibraryById(Long id);
+  public int deleteGPatentLibraryById(String id);
 
   String importGPatentLibrary(List<GPatentLibrary> gPatentLibraries, boolean updateSupport);
 

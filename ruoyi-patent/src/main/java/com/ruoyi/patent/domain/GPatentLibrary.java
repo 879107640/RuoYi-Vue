@@ -117,13 +117,7 @@ public class GPatentLibrary extends BaseEntity {
    */
   private Integer reserveStatus;
 
-  public Integer getReserveStatus() {
-    return reserveStatus;
-  }
 
-  public void setReserveStatus(Integer reserveStatus) {
-    this.reserveStatus = reserveStatus;
-  }
 
   @Excel(name = "备注")
   private String remark;

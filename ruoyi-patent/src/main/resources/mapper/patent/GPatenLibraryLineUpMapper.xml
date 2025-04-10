@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.patent.mapper.GPatenLibraryLineUpMapper">
+
+  <resultMap type="GPatenLibraryLineUp" id="GPatenLibraryLineUpResult">
+        <result property="id" column="id"/>
+        <result property="gPatentId" column="g_patent_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="lineUpNum" column="line_up_num"/>
+        <result property="createdTime" column="created_time"/>
+  </resultMap>
+
+  <sql id="selectGPatenLibraryLineUpVo">
+      select id, g_patent_id, user_id, line_up_num, created_time
+      from g_paten_library_line_up
+  </sql>
+
+  <select id="selectGPatenLibraryLineUpList" parameterType="GPatenLibraryLineUp" resultMap="GPatenLibraryLineUpResult">
+    <include refid="selectGPatenLibraryLineUpVo"/>
+    <where>
+                  <if test="gPatentId != null  and gPatentId != ''">and g_patent_id = #{gPatentId}</if>
+                  <if test="userId != null ">and user_id = #{userId}</if>
+                  <if test="lineUpNum != null ">and line_up_num = #{lineUpNum}</if>
+                  <if test="createdTime != null ">and created_time = #{createdTime}</if>
+    </where>
+  </select>
+
+  <select id="selectGPatenLibraryLineUpById" parameterType="Long"
+          resultMap="GPatenLibraryLineUpResult">
+        <include refid="selectGPatenLibraryLineUpVo"/>
+        where id = #{id}
+  </select>
+
+  <insert id="insertGPatenLibraryLineUp" parameterType="GPatenLibraryLineUp">
+    insert into g_paten_library_line_up
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+              <if test="id != null">id,</if>
+              <if test="gPatentId != null">g_patent_id,</if>
+              <if test="userId != null">user_id,</if>
+              <if test="lineUpNum != null">line_up_num,</if>
+              <if test="createdTime != null">created_time,</if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+              <if test="id != null">#{id},</if>
+              <if test="gPatentId != null">#{gPatentId},</if>
+              <if test="userId != null">#{userId},</if>
+              <if test="lineUpNum != null">#{lineUpNum},</if>
+              <if test="createdTime != null">#{createdTime},</if>
+    </trim>
+  </insert>
+
+  <update id="updateGPatenLibraryLineUp" parameterType="GPatenLibraryLineUp">
+    update g_paten_library_line_up
+    <trim prefix="SET" suffixOverrides=",">
+              <if test="gPatentId != null">g_patent_id = #{gPatentId},
+              </if>
+              <if test="userId != null">user_id = #{userId},
+              </if>
+              <if test="lineUpNum != null">line_up_num = #{lineUpNum},
+              </if>
+              <if test="createdTime != null">created_time = #{createdTime},
+              </if>
+    </trim>
+    where id = #{id}
+  </update>
+
+  <delete id="deleteGPatenLibraryLineUpById" parameterType="Long">
+      delete
+      from g_paten_library_line_up where id = #{id}
+  </delete>
+
+  <delete id="deleteGPatenLibraryLineUpByIds" parameterType="String">
+    delete from g_paten_library_line_up where id in
+    <foreach item="id" collection="array" open="(" separator="," close=")">
+      #{id}
+    </foreach>
+  </delete>
+
+  <!-- 更新后续排队号减1 -->
+  <update id="decrementQueueNumber">
+    UPDATE g_paten_library_line_up
+    SET queue_number = queue_number - 1
+    WHERE g_patent_id = #{patentId} AND line_up_num > #{lineUpNum}
+  </update>
+
+  <!-- 删除指定用户和专利的排队记录 -->
+  <delete id="deleteByUserAndPatent">
+    DELETE FROM g_paten_library_line_up
+    WHERE g_patent_id = #{patentId} AND user_id = #{userId}
+  </delete>
+</mapper>

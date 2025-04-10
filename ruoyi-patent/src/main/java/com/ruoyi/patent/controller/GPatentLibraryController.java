@@ -114,10 +114,42 @@ public class GPatentLibraryController extends BaseController {
    * @param id
    */
   @PutMapping("/reserve/{id}")
-  public void reserve(@PathVariable("id") String id) {
+  public AjaxResult reserve(@PathVariable("id") String id) {
     LoginUser loginUser = getLoginUser();
     gPatentLibraryService.reserve(id, loginUser);
-
+    return success();
   }
 
+  /**
+   * 取消预定
+   * @param id
+   */
+  @PutMapping("/cancel-reserve/{id}")
+  public AjaxResult cancelReserve(@PathVariable("id") String id) {
+    LoginUser loginUser = getLoginUser();
+    gPatentLibraryService.cancelReserve(id, loginUser);
+    return success();
+  }
+
+  /**
+   * 预定排队
+   * @param id
+   */
+  @PutMapping("/line-up-reserve/{id}")
+  public AjaxResult lineUpReserve(@PathVariable("id") String id) {
+    LoginUser loginUser = getLoginUser();
+    gPatentLibraryService.lineUpReserve(id, loginUser);
+    return success();
+  }
+
+  /**
+   * 取消排队
+   * @param id
+   */
+  @PutMapping("/cancel-line-up-reserve/{id}")
+  public AjaxResult cancelLineUpReserve(@PathVariable("id") String id) {
+    LoginUser loginUser = getLoginUser();
+    gPatentLibraryService.cancelLineUpReserve(id, loginUser);
+    return success();
+  }
 }

@@ -21,7 +21,7 @@ public class GPatentLibrary extends BaseEntity {
   /**
    * 主键ID
    */
-  private Long id;
+  private String id;
 
   /**
    * 专利号
@@ -83,7 +83,7 @@ public class GPatentLibrary extends BaseEntity {
   private String resourceProvider;
 
   /**
-   * 状态
+   * 状态: 1-待出售；2-预约
    */
   private String statusKey;
 
@@ -112,21 +112,29 @@ public class GPatentLibrary extends BaseEntity {
    */
   private Date deadline;
 
-  /**
-   * 预定状态
-   */
-  private Integer reserveStatus;
 
+  /**
+   * 预定人ID
+   */
+  private Long reserveUserId;
 
 
   @Excel(name = "备注")
   private String remark;
 
-  public void setId(Long id) {
+  public Long getReserveUserId() {
+    return reserveUserId;
+  }
+
+  public void setReserveUserId(Long reserveUserId) {
+    this.reserveUserId = reserveUserId;
+  }
+
+  public void setId(String id) {
     this.id = id;
   }
 
-  public Long getId() {
+  public String getId() {
     return id;
   }
 

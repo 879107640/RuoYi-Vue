@@ -34,13 +34,13 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/patent/library")
 public class GPatentLibraryController extends BaseController {
+
   @Autowired
   private IGPatentLibraryService gPatentLibraryService;
 
   /**
    * 查询专利库数据列表
    */
-  @PreAuthorize("@ss.hasPermi('patent:library:list')")
   @GetMapping("/list")
   public TableDataInfo list(GPatentLibrary gPatentLibrary) {
     startPage();
@@ -51,7 +51,6 @@ public class GPatentLibraryController extends BaseController {
   /**
    * 导出专利库数据列表
    */
-  @PreAuthorize("@ss.hasPermi('patent:library:export')")
   @Log(title = "专利库数据", businessType = BusinessType.EXPORT)
   @PostMapping("/export")
   public void export(HttpServletResponse response, GPatentLibrary gPatentLibrary) {
@@ -63,18 +62,16 @@ public class GPatentLibraryController extends BaseController {
   /**
    * 获取专利库数据详细信息
    */
-  @PreAuthorize("@ss.hasPermi('patent:library:query')")
-  @GetMapping(value = "/{id}")
-  public AjaxResult getInfo(@PathVariable("id") String id) {
+  @GetMapping(value = "/info")
+  public AjaxResult getInfo(String id) {
     return success(gPatentLibraryService.selectGPatentLibraryById(id));
   }
 
   /**
    * 新增专利库数据
    */
-  @PreAuthorize("@ss.hasPermi('patent:library:add')")
   @Log(title = "专利库数据", businessType = BusinessType.INSERT)
-  @PostMapping
+  @PostMapping("/add")
   public AjaxResult add(@RequestBody GPatentLibrary gPatentLibrary) {
     return toAjax(gPatentLibraryService.insertGPatentLibrary(gPatentLibrary));
   }
@@ -82,9 +79,8 @@ public class GPatentLibraryController extends BaseController {
   /**
    * 修改专利库数据
    */
-  @PreAuthorize("@ss.hasPermi('patent:library:edit')")
   @Log(title = "专利库数据", businessType = BusinessType.UPDATE)
-  @PutMapping
+  @PostMapping("/update")
   public AjaxResult edit(@RequestBody GPatentLibrary gPatentLibrary) {
     return toAjax(gPatentLibraryService.updateGPatentLibrary(gPatentLibrary));
   }
@@ -92,10 +88,9 @@ public class GPatentLibraryController extends BaseController {
   /**
    * 删除专利库数据
    */
-  @PreAuthorize("@ss.hasPermi('patent:library:remove')")
   @Log(title = "专利库数据", businessType = BusinessType.DELETE)
-  @DeleteMapping("/{ids}")
-  public AjaxResult remove(@PathVariable String[] ids) {
+  @GetMapping("/delete")
+  public AjaxResult remove(String[] ids) {
     return toAjax(gPatentLibraryService.deleteGPatentLibraryByIds(ids));
   }
 

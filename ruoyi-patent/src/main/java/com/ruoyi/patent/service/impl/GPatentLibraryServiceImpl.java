@@ -1,16 +1,20 @@
 package com.ruoyi.patent.service.impl;
 
+import com.ruoyi.common.core.domain.model.LoginUser;
+import com.ruoyi.common.exception.ServiceException;
+import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.patent.domain.GPatenLibraryLineUp;
+import com.ruoyi.patent.domain.GPatentLibrary;
+import com.ruoyi.patent.mapper.GPatenLibraryLineUpMapper;
+import com.ruoyi.patent.mapper.GPatentLibraryMapper;
+import com.ruoyi.patent.service.IGPatentLibraryService;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-
-import com.ruoyi.common.core.domain.model.LoginUser;
-import com.ruoyi.common.utils.DateUtils;
-import com.ruoyi.common.utils.bean.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import com.ruoyi.patent.mapper.GPatentLibraryMapper;
-import com.ruoyi.patent.domain.GPatentLibrary;
-import com.ruoyi.patent.service.IGPatentLibraryService;
 
 /**
  * 专利库数据Service业务层处理
@@ -20,8 +24,11 @@ import com.ruoyi.patent.service.IGPatentLibraryService;
  */
 @Service
 public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
-  @Autowired
+  @Resource
   private GPatentLibraryMapper gPatentLibraryMapper;
+
+  @Resource
+  GPatenLibraryLineUpMapper libraryLineUpMapper;
 
   /**
    * 查询专利库数据
@@ -107,7 +114,83 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
   }
 
   @Override
+  @Transactional(rollbackFor = Exception.class)
   public void reserve(String id, LoginUser loginUser) {
-    gPatentLibraryMapper.selectGPatentLibraryById(id);
+    GPatentLibrary gPatentLibrary = gPatentLibraryMapper.selectGPatentLibraryById(id);
+
+    if (Objects.isNull(gPatentLibrary)) {
+      throw new ServiceException("专利不存在");
+    }
+
+    if (gPatentLibrary.getStatusKey().equals("2") && !Objects.equals(gPatentLibrary.getReserveUserId(), loginUser.getUserId())) {
+      throw new ServiceException("当前专利已被预约，请点击排队预约");
+    }
+
+    gPatentLibrary.setStatusKey("2");
+    gPatentLibrary.setReserveUserId(loginUser.getUserId());
+    gPatentLibraryMapper.updateGPatentLibrary(gPatentLibrary);
+  }
+
+  @Override
+  public void cancelReserve(String id, LoginUser loginUser) {
+    GPatentLibrary gPatentLibrary = this.selectGPatentLibraryById(id);
+    if (Objects.isNull(gPatentLibrary)) {
+      throw new ServiceException("专利不存在");
+    }
+    if (!gPatentLibrary.getStatusKey().equals("2")) {
+      throw new ServiceException("当前状态不能被取消");
+    }
+
+    if (gPatentLibrary.getStatusKey().equals("2") && !Objects.equals(gPatentLibrary.getReserveUserId(), loginUser.getUserId())) {
+      throw new ServiceException("无权取消当前专利预约");
+    }
+
+    gPatentLibrary.setStatusKey("1");
+    gPatentLibrary.setReserveUserId(null);
+    gPatentLibraryMapper.updateGPatentLibrary(gPatentLibrary);
+  }
+
+  @Override
+  public void lineUpReserve(String id, LoginUser loginUser) {
+    GPatentLibrary gPatentLibrary = this.selectGPatentLibraryById(id);
+    if (Objects.isNull(gPatentLibrary)) {
+      throw new ServiceException("专利不存在");
+    }
+    if (gPatentLibrary.getStatusKey().equals("1")) {
+      throw new ServiceException("当前专利不需要预约排队");
+    }
+
+    GPatenLibraryLineUp libraryLineUp = new GPatenLibraryLineUp();
+    libraryLineUp.setgPatentId(id);
+    List<GPatenLibraryLineUp> gPatenLibraryLineUps = libraryLineUpMapper.selectGPatenLibraryLineUpList(libraryLineUp);
+    for (GPatenLibraryLineUp gPatenLibraryLineUp : gPatenLibraryLineUps) {
+      if (gPatenLibraryLineUp.getUserId().equals(loginUser.getUserId())) {
+        throw new ServiceException("当前专利不允许重复排队");
+      }
+    }
+    GPatenLibraryLineUp insert = new GPatenLibraryLineUp();
+    insert.setUserId(loginUser.getUserId());
+    insert.setCreatedTime(new Date());
+    insert.setgPatentId(id);
+    insert.setLineUpNum((long) (gPatenLibraryLineUps.size() + 1));
+    libraryLineUpMapper.insertGPatenLibraryLineUp(insert);
+
+  }
+
+  @Override
+  public void cancelLineUpReserve(String id, LoginUser loginUser) {
+    GPatenLibraryLineUp libraryLineUp = new GPatenLibraryLineUp();
+    libraryLineUp.setgPatentId(id);
+    libraryLineUp.setUserId(loginUser.getUserId());
+    List<GPatenLibraryLineUp> gPatenLibraryLineUps = libraryLineUpMapper.selectGPatenLibraryLineUpList(libraryLineUp);
+    if (gPatenLibraryLineUps.isEmpty()) {
+      throw new ServiceException("Queue record not found");
+    }
+
+    int i = libraryLineUpMapper.deleteByUserAndPatent(id, loginUser.getUserId());
+
+    if (i > 0) {
+      libraryLineUpMapper.decrementQueueNumber(id, gPatenLibraryLineUps.get(0).getLineUpNum());
+    }
   }
 }

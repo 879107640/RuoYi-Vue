@@ -64,4 +64,18 @@ public interface IGPatentLibraryService {
 
   void reserve(String id, LoginUser loginUser);
 
+  /**
+   * 取消排队
+   * @param id 专利id
+   * @param loginUser 登陆用户信息
+   */
+  void cancelReserve(String id, LoginUser loginUser);
+  /**
+   * 预约排队
+   * @param id 专利id
+   * @param loginUser 登陆用户信息
+   */
+  void lineUpReserve(String id, LoginUser loginUser);
+
+  void cancelLineUpReserve(String id, LoginUser loginUser);
 }

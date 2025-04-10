@@ -119,6 +119,7 @@
       <if test="bookerValue != null">booker_value = #{bookerValue},</if>
       <if test="days != null">days = #{days},</if>
       <if test="deadline != null">deadline = #{deadline},</if>
+      and reserve_user_id = #{reserveUserId},
       <if test="createTime != null">create_time = #{createTime},</if>
       <if test="updateTime != null">update_time = #{updateTime},</if>
     </trim>

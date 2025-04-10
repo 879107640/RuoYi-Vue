@@ -25,6 +25,8 @@
     <result property="deadline" column="deadline"/>
     <result property="createTime" column="create_time"/>
     <result property="updateTime" column="update_time"/>
+    <result property="createBy" column="create_by"/>
+    <result property="updateBy" column="update_by"/>
   </resultMap>
 
   <sql id="selectGPatentLibraryVo">
@@ -37,13 +39,23 @@
   </sql>
 
   <select id="selectGPatentLibraryList" parameterType="GPatentLibrary" resultMap="GPatentLibraryResult">
-    <include refid="selectGPatentLibraryVo"/>
-    <where>
-      <if test="params.beginGuidancePrice != null and params.beginGuidancePrice != '' and params.endGuidancePrice != null and params.endGuidancePrice != ''">and guidance_price
-        between #{params.beginGuidancePrice} and #{params.endGuidancePrice}
-      </if>
-    </where>
-  </select>
+  <include refid="selectGPatentLibraryVo"/>
+  <where>
+    <if test="patentNo != null  and patentNo != ''">and patent_no = #{patentNo}</if>
+    <if test="patentName != null  and patentName != ''">and patent_name like concat('%', #{patentName}, '%')</if>
+    <if test="patentTypeKey != null  and patentTypeKey != ''">and patent_type_key = #{patentTypeKey}</if>
+    <if test="domain != null  and domain != ''">and domain = #{domain}</if>
+    <if test="feeDate != null ">and fee_date = #{feeDate}</if>
+    <if test="params.beginGuidancePrice != null and params.beginGuidancePrice != '' and params.endGuidancePrice != null and params.endGuidancePrice != ''">and guidance_price between
+      #{params.beginGuidancePrice} and #{params.endGuidancePrice}
+    </if>
+    <if test="highTechReportedKey != null  and highTechReportedKey != ''">and high_tech_reported_key = #{highTechReportedKey}</if>
+    <if test="resourceProvider != null  and resourceProvider != ''">and resource_provider like concat('%', #{resourceProvider}, '%')</if>
+    <if test="statusKey != null  and statusKey != ''">and status_key = #{statusKey}</if>
+    <if test="bookerKey != null  and bookerKey != ''">and booker_key = #{bookerKey}</if>
+    <if test="createTime != null ">and create_time = #{createTime}</if>
+    <if test="createBy != null  and createBy != ''">and create_by like concat('%', #{createBy}, '%')</if>
+  </where>
 
   <select id="selectGPatentLibraryById" parameterType="Long" resultMap="GPatentLibraryResult">
     <include refid="selectGPatentLibraryVo"/>
@@ -75,6 +87,8 @@
       <if test="deadline != null">deadline,</if>
       <if test="createTime != null">create_time,</if>
       <if test="updateTime != null">update_time,</if>
+      <if test="createBy != null">create_by,</if>
+      <if test="updateBy != null">update_by,</if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="patentNo != null and patentNo != ''">#{patentNo},</if>
@@ -96,32 +110,56 @@
       <if test="deadline != null">#{deadline},</if>
       <if test="createTime != null">#{createTime},</if>
       <if test="updateTime != null">#{updateTime},</if>
+      <if test="createBy != null">#{createBy},</if>
+      <if test="updateBy != null">#{updateBy},</if>
     </trim>
   </insert>
 
   <update id="updateGPatentLibrary" parameterType="GPatentLibrary">
     update g_patent_library
     <trim prefix="SET" suffixOverrides=",">
-      <if test="patentNo != null and patentNo != ''">patent_no = #{patentNo},</if>
-      <if test="patentName != null and patentName != ''">patent_name = #{patentName},</if>
-      <if test="patentTypeKey != null and patentTypeKey != ''">patent_type_key = #{patentTypeKey},</if>
-      <if test="patentTypeValue != null">patent_type_value = #{patentTypeValue},</if>
-      <if test="domain != null">domain = #{domain},</if>
-      <if test="feeDate != null">fee_date = #{feeDate},</if>
-      <if test="guidancePrice != null">guidance_price = #{guidancePrice},</if>
-      <if test="highTechReportedKey != null">high_tech_reported_key = #{highTechReportedKey},</if>
-      <if test="highTechReportedValue != null">high_tech_reported_value = #{highTechReportedValue},</if>
-      <if test="resourceProvider != null and resourceProvider != ''">resource_provider = #{resourceProvider},</if>
-      <if test="remark != null">remark = #{remark},</if>
-      <if test="statusKey != null">status_key = #{statusKey},</if>
-      <if test="statusValue != null">status_value = #{statusValue},</if>
-      <if test="bookerKey != null">booker_key = #{bookerKey},</if>
-      <if test="bookerValue != null">booker_value = #{bookerValue},</if>
-      <if test="days != null">days = #{days},</if>
-      <if test="deadline != null">deadline = #{deadline},</if>
-      and reserve_user_id = #{reserveUserId},
-      <if test="createTime != null">create_time = #{createTime},</if>
-      <if test="updateTime != null">update_time = #{updateTime},</if>
+      <if test="patentNo != null and patentNo != ''">patent_no = #{patentNo},
+      </if>
+      <if test="patentName != null and patentName != ''">patent_name = #{patentName},
+      </if>
+      <if test="patentTypeKey != null and patentTypeKey != ''">patent_type_key = #{patentTypeKey},
+      </if>
+      <if test="patentTypeValue != null">patent_type_value = #{patentTypeValue},
+      </if>
+      <if test="domain != null">domain = #{domain},
+      </if>
+      <if test="feeDate != null">fee_date = #{feeDate},
+      </if>
+      <if test="guidancePrice != null">guidance_price = #{guidancePrice},
+      </if>
+      <if test="highTechReportedKey != null">high_tech_reported_key = #{highTechReportedKey},
+      </if>
+      <if test="highTechReportedValue != null">high_tech_reported_value = #{highTechReportedValue},
+      </if>
+      <if test="resourceProvider != null and resourceProvider != ''">resource_provider = #{resourceProvider},
+      </if>
+      <if test="remark != null">remark = #{remark},
+      </if>
+      <if test="statusKey != null">status_key = #{statusKey},
+      </if>
+      <if test="statusValue != null">status_value = #{statusValue},
+      </if>
+      <if test="bookerKey != null">booker_key = #{bookerKey},
+      </if>
+      <if test="bookerValue != null">booker_value = #{bookerValue},
+      </if>
+      <if test="days != null">days = #{days},
+      </if>
+      <if test="deadline != null">deadline = #{deadline},
+      </if>
+      <if test="createTime != null">create_time = #{createTime},
+      </if>
+      <if test="updateTime != null">update_time = #{updateTime},
+      </if>
+      <if test="createBy != null">create_by = #{createBy},
+      </if>
+      <if test="updateBy != null">update_by = #{updateBy},
+      </if>
     </trim>
     where id = #{id}
   </update>

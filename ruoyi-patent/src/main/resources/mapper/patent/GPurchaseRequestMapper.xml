@@ -24,6 +24,7 @@
     <include refid="selectGPurchaseRequestVo"/>
     <where>
                   <if test="info != null  and info != ''">and info like concat('%', #{info}, '%')</if>
+        <if test="createBy != null  and createBy != ''">and create_by like concat('%', #{createBy}, '%')</if>
     </where>
   </select>
 
@@ -89,4 +90,11 @@
       #{id}
     </foreach>
   </delete>
+
+    <!-- 更新后续排队号减1 -->
+    <update id="increaseRecommendCount">
+        UPDATE g_purchase_request
+        SET recommendCount = recommendCount + 1
+        WHERE id = #{id}
+    </update>
 </mapper>

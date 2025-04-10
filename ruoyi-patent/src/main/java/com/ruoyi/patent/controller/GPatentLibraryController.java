@@ -3,6 +3,7 @@ package com.ruoyi.patent.controller;
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
+import com.ruoyi.common.annotation.Anonymous;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -31,6 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
  * @author hujch
  * @date 2025-04-10
  */
+@Anonymous
 @RestController
 @RequestMapping("/patent/library")
 public class GPatentLibraryController extends BaseController {

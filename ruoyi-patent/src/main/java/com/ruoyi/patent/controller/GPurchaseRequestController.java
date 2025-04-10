@@ -3,6 +3,7 @@ package com.ruoyi.patent.controller;
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
+import com.ruoyi.common.annotation.Anonymous;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,7 @@ import com.ruoyi.common.core.page.TableDataInfo;
  * @author ruoyi
  * @date 2025-04-11
  */
+@Anonymous
 @RestController
 @RequestMapping("/patent/purchase")
 public class GPurchaseRequestController extends BaseController {

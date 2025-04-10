@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.uuid.UUID;
+import com.ruoyi.patent.mapper.GPurchaseRequestMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.patent.mapper.GPurchaseRecommendMapper;
@@ -20,6 +21,9 @@ import com.ruoyi.patent.service.IGPurchaseRecommendService;
 public class GPurchaseRecommendServiceImpl implements IGPurchaseRecommendService {
     @Autowired
     private GPurchaseRecommendMapper gPurchaseRecommendMapper;
+
+    @Autowired
+    private GPurchaseRequestMapper gPurchaseRequestMapper;
 
     /**
      * 查询推荐信息
@@ -53,6 +57,8 @@ public class GPurchaseRecommendServiceImpl implements IGPurchaseRecommendService
     public int insertGPurchaseRecommend(GPurchaseRecommend gPurchaseRecommend) {
         gPurchaseRecommend.setCreateTime(DateUtils.getNowDate());
         gPurchaseRecommend.setId(UUID.randomUUID().toString());
+        // 增加推荐数
+        int i = gPurchaseRequestMapper.increaseRecommendCount(gPurchaseRecommend.getPurchaseId());
         return gPurchaseRecommendMapper.insertGPurchaseRecommend(gPurchaseRecommend);
     }
 

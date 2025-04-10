@@ -3,6 +3,7 @@ package com.ruoyi.patent.mapper;
 import java.util.List;
 
 import com.ruoyi.patent.domain.GPurchaseRequest;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 求购信息Mapper接口
@@ -58,4 +59,6 @@ public interface GPurchaseRequestMapper {
      * @return 结果
      */
     public int deleteGPurchaseRequestByIds(String[] ids);
+
+    int increaseRecommendCount(@Param("id") String id);
 }

@@ -51,8 +51,8 @@ public class GPatentLibraryController extends BaseController {
     /*@PreAuthorize("@ss.hasPermi('patent:library:export')")*/
     @Log(title = "专利库数据", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
-    public void export(HttpServletResponse response, GPatentLibrary gPatentLibrary) {
-        List<GPatentLibrary> list = gPatentLibraryService.selectGPatentLibraryList(gPatentLibrary);
+    public void export(HttpServletResponse response, GPatentLibrary gPatentLibrary,int type) {
+        List<GPatentLibrary> list = gPatentLibraryService.selectGPatentLibraryList(gPatentLibrary,type);
         ExcelUtil<GPatentLibrary> util = new ExcelUtil<GPatentLibrary>(GPatentLibrary.class);
         util.exportExcel(response, list, "专利库数据数据");
     }

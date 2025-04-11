@@ -118,6 +118,16 @@ public class GPatentLibrary extends BaseEntity {
    */
   private Long reserveUserId;
 
+  private String guidancePriceVo;
+
+  // 添加临时字段（MyBatis 可直接使用）
+  public String getMinPrice() {
+    return guidancePriceVo != null ? guidancePriceVo.split("-")[0] : null;
+  }
+
+  public String getMaxPrice() {
+    return guidancePriceVo != null ? guidancePriceVo.split("-")[1] : null;
+  }
 
   @Excel(name = "备注")
   private String remark;
@@ -128,6 +138,14 @@ public class GPatentLibrary extends BaseEntity {
 
   public void setReserveUserId(Long reserveUserId) {
     this.reserveUserId = reserveUserId;
+  }
+
+  public String getGuidancePriceVo() {
+    return guidancePriceVo;
+  }
+
+  public void setGuidancePriceVo(String guidancePriceVo) {
+    this.guidancePriceVo = guidancePriceVo;
   }
 
   public void setId(String id) {

@@ -50,6 +50,8 @@ public class BaseEntity implements Serializable {
    */
   private String remark;
 
+  private String search;
+
   /**
    * 请求参数
    */
@@ -102,6 +104,14 @@ public class BaseEntity implements Serializable {
 
   public void setRemark(String remark) {
     this.remark = remark;
+  }
+
+  public String getSearch() {
+    return search;
+  }
+
+  public void setSearch(String search) {
+    this.search = search;
   }
 
   public Map<String, Object> getParams() {

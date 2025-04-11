@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.ruoyi.common.annotation.Anonymous;
 import com.ruoyi.common.core.domain.model.LoginUser;
+import com.ruoyi.common.utils.StringUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -73,7 +74,7 @@ public class GPurchaseRecommendController extends BaseController {
     @PostMapping("/add")
     public AjaxResult add(@RequestBody GPurchaseRecommend gPurchaseRecommend) {
         LoginUser user = this.getLoginUser();
-        if (user != null) {
+        if (StringUtils.isNotEmpty(gPurchaseRecommend.getCreateBy()) && user != null) {
             gPurchaseRecommend.setCreateBy(String.valueOf(user.getUserId()));
         }
         return toAjax(gPurchaseRecommendService.insertGPurchaseRecommend(gPurchaseRecommend));

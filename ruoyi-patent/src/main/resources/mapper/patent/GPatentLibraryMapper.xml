@@ -39,23 +39,29 @@
   </sql>
 
   <select id="selectGPatentLibraryList" parameterType="GPatentLibrary" resultMap="GPatentLibraryResult">
-  <include refid="selectGPatentLibraryVo"/>
-  <where>
-    <if test="patentNo != null  and patentNo != ''">and patent_no = #{patentNo}</if>
-    <if test="patentName != null  and patentName != ''">and patent_name like concat('%', #{patentName}, '%')</if>
-    <if test="patentTypeKey != null  and patentTypeKey != ''">and patent_type_key = #{patentTypeKey}</if>
-    <if test="domain != null  and domain != ''">and domain = #{domain}</if>
-    <if test="feeDate != null ">and fee_date = #{feeDate}</if>
-    <if test="params.beginGuidancePrice != null and params.beginGuidancePrice != '' and params.endGuidancePrice != null and params.endGuidancePrice != ''">and guidance_price between
-      #{params.beginGuidancePrice} and #{params.endGuidancePrice}
-    </if>
-    <if test="highTechReportedKey != null  and highTechReportedKey != ''">and high_tech_reported_key = #{highTechReportedKey}</if>
-    <if test="resourceProvider != null  and resourceProvider != ''">and resource_provider like concat('%', #{resourceProvider}, '%')</if>
-    <if test="statusKey != null  and statusKey != ''">and status_key = #{statusKey}</if>
-    <if test="bookerKey != null  and bookerKey != ''">and booker_key = #{bookerKey}</if>
-    <if test="createTime != null ">and create_time = #{createTime}</if>
-    <if test="createBy != null  and createBy != ''">and create_by like concat('%', #{createBy}, '%')</if>
-  </where>
+    <include refid="selectGPatentLibraryVo"/>
+    <where>
+      <if test="patentNo != null  and patentNo != ''">and patent_no = #{patentNo}</if>
+      <if test="patentName != null  and patentName != ''">and patent_name like concat('%', #{patentName}, '%')</if>
+      <if test="patentTypeKey != null  and patentTypeKey != ''">and patent_type_key = #{patentTypeKey}</if>
+      <if test="domain != null  and domain != ''">and domain = #{domain}</if>
+      <if test="feeDate != null ">and fee_date = #{feeDate}</if>
+      <if test="params.beginGuidancePrice != null and params.beginGuidancePrice != '' and params.endGuidancePrice != null and params.endGuidancePrice != ''">
+        and guidance_price between
+        #{params.beginGuidancePrice} and #{params.endGuidancePrice}
+      </if>
+      <if test="highTechReportedKey != null  and highTechReportedKey != ''">and high_tech_reported_key =
+        #{highTechReportedKey}
+      </if>
+      <if test="resourceProvider != null  and resourceProvider != ''">and resource_provider like concat('%',
+        #{resourceProvider}, '%')
+      </if>
+      <if test="statusKey != null  and statusKey != ''">and status_key = #{statusKey}</if>
+      <if test="bookerKey != null  and bookerKey != ''">and booker_key = #{bookerKey}</if>
+      <if test="createTime != null ">and create_time = #{createTime}</if>
+      <if test="createBy != null  and createBy != ''">and create_by like concat('%', #{createBy}, '%')</if>
+    </where>
+  </select>
 
   <select id="selectGPatentLibraryById" parameterType="Long" resultMap="GPatentLibraryResult">
     <include refid="selectGPatentLibraryVo"/>
@@ -176,4 +182,5 @@
       #{id}
     </foreach>
   </delete>
+
 </mapper>

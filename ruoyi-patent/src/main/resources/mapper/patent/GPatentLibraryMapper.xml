@@ -41,7 +41,9 @@
   <select id="selectGPatentLibraryList" parameterType="GPatentLibrary" resultMap="GPatentLibraryResult">
     <include refid="selectGPatentLibraryVo"/>
     <where>
-      <if test="search != null  and search != ''">and ( patent_no like concat('%', #{search}, '%') or patent_name like concat('%', #{search}, '%') or domain like concat('%', #{search}, '%')  )</if>
+      <if test="search != null  and search != ''">and ( patent_no like concat('%', #{search}, '%') or patent_name like concat('%', #{search}, '%') or domain like concat('%',
+        #{search}, '%') )
+      </if>
       <if test="patentNo != null  and patentNo != ''">and patent_no = #{patentNo}</if>
       <if test="patentName != null  and patentName != ''">and patent_name like concat('%', #{patentName}, '%')</if>
       <if test="patentTypeKey != null and patentTypeKey != ''">
@@ -68,7 +70,12 @@
       <if test="resourceProvider != null  and resourceProvider != ''">and resource_provider like concat('%',
         #{resourceProvider}, '%')
       </if>
-      <if test="statusKey != null  and statusKey != ''">and status_key = #{statusKey}</if>
+      <if test="statusKeys != null and statusKeys.length > 0">
+        and status_key in
+        <foreach collection="statusKeys" item="statusKey" open="(" separator="," close=")">
+          #{statusKey}
+        </foreach>
+      </if>
       <if test="bookerKey != null  and bookerKey != ''">and booker_key = #{bookerKey}</if>
       <if test="createTime != null ">and DATE(create_time) = DATE(#{createTime})</if>
       <if test="createBy != null  and createBy != ''">and create_by like concat('%', #{createBy}, '%')</if>

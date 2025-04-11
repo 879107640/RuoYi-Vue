@@ -120,6 +120,19 @@ public class GPatentLibrary extends BaseEntity {
 
   private String guidancePriceVo;
 
+  /**
+   * 搜索状态
+   */
+  private String[] statusKeys;
+
+  public String[] getStatusKeys() {
+    return statusKeys;
+  }
+
+  public void setStatusKeys(String[] statusKeys) {
+    this.statusKeys = statusKeys;
+  }
+
   // 添加临时字段（MyBatis 可直接使用）
   public String getMinPrice() {
     return guidancePriceVo != null ? guidancePriceVo.split("-")[0] : null;

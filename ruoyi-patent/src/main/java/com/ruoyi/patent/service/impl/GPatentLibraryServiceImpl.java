@@ -124,7 +124,7 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
       throw new ServiceException("专利不存在");
     }
 
-    if (gPatentLibrary.getStatusKey().equals("2") && !Objects.equals(gPatentLibrary.getReserveUserId(), loginUser.getUserId())) {
+    if (Objects.nonNull(gPatentLibrary.getStatusKey()) && gPatentLibrary.getStatusKey().equals("2") && !Objects.equals(gPatentLibrary.getReserveUserId(), loginUser.getUserId())) {
       throw new ServiceException("当前专利已被预约，请点击排队预约");
     }
 

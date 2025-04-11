@@ -63,7 +63,7 @@
     </where>
   </select>
 
-  <select id="selectGPatentLibraryById" parameterType="Long" resultMap="GPatentLibraryResult">
+  <select id="selectGPatentLibraryById" parameterType="String" resultMap="GPatentLibraryResult">
     <include refid="selectGPatentLibraryVo"/>
     where id = #{id}
   </select>

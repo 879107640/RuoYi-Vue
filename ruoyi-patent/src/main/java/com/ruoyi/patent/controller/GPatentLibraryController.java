@@ -156,7 +156,7 @@ public class GPatentLibraryController extends BaseController {
   @PutMapping("/cancel-line-up-reserve/{id}")
   public AjaxResult cancelLineUpReserve(@PathVariable("id") String id) {
     LoginUser loginUser = getLoginUser();
-    gPatentLibraryService.cancelLineUpReserve(id, loginUser);
+    gPatentLibraryService.cancelLineUpReserve(id, loginUser.getUserId());
     return success();
   }
 

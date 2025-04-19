@@ -5,6 +5,7 @@ import java.util.List;
 import com.ruoyi.patent.domain.GPatentLibrary;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Update;
 
 /**
  * 专利库数据Mapper接口
@@ -65,5 +66,8 @@ public interface GPatentLibraryMapper {
 
   @Delete("delete from g_patent_library where create_by = #{username}")
   void allDelete(String username);
+
+  @Update("update g_patent_library set status_key = 1, booker_key = null, booker_value = null, booker_time = null where id = #{id}")
+  void cancelReserve(String id);
 
 }

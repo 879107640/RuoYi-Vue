@@ -77,7 +77,7 @@ public interface IGPatentLibraryService {
    */
   void lineUpReserve(String id, LoginUser loginUser);
 
-  void cancelLineUpReserve(String id, LoginUser loginUser);
+  void cancelLineUpReserve(String id, Long userId);
 
   /**
    * 一件删除

@@ -1,5 +1,6 @@
 package com.ruoyi.patent.service.impl;
 
+import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.DateUtils;
@@ -9,10 +10,12 @@ import com.ruoyi.patent.domain.GPatentLibrary;
 import com.ruoyi.patent.mapper.GPatenLibraryLineUpMapper;
 import com.ruoyi.patent.mapper.GPatentLibraryMapper;
 import com.ruoyi.patent.service.IGPatentLibraryService;
+import com.ruoyi.system.mapper.SysUserMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -21,7 +24,6 @@ import java.util.Objects;
  * 专利库数据Service业务层处理
  *
  * @author hujch
- * @date 2025-04-10
  */
 @Service
 public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
@@ -30,6 +32,9 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
 
   @Resource
   GPatenLibraryLineUpMapper libraryLineUpMapper;
+
+  @Resource
+  SysUserMapper userMapper;
 
   /**
    * 查询专利库数据
@@ -139,7 +144,7 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
       throw new ServiceException("专利不存在");
     }
 
-    if (Objects.nonNull(gPatentLibrary.getStatusKey()) && gPatentLibrary.getStatusKey().equals("2") && !Objects.equals(gPatentLibrary.getReserveUserId(), loginUser.getUserId())) {
+    if (Objects.nonNull(gPatentLibrary.getStatusKey()) && gPatentLibrary.getStatusKey().equals("2") && !Objects.equals(gPatentLibrary.getBookerKey(), loginUser.getUserId())) {
       throw new ServiceException("当前专利已被预约，请点击排队预约");
     }
 
@@ -151,6 +156,7 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
   }
 
   @Override
+  @Transactional(rollbackFor = Exception.class)
   public void cancelReserve(String id, LoginUser loginUser) {
     GPatentLibrary gPatentLibrary = this.selectGPatentLibraryById(id);
     if (Objects.isNull(gPatentLibrary)) {
@@ -160,13 +166,33 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
       throw new ServiceException("当前状态不能被取消");
     }
 
-    if (Objects.nonNull(gPatentLibrary.getStatusKey()) && gPatentLibrary.getStatusKey().equals("2") && !Objects.equals(gPatentLibrary.getReserveUserId(), loginUser.getUserId())) {
+    if (Objects.nonNull(gPatentLibrary.getStatusKey()) && gPatentLibrary.getStatusKey().equals("2") && !Objects.equals(gPatentLibrary.getBookerKey(), loginUser.getUserId())) {
       throw new ServiceException("无权取消当前专利预约");
     }
 
-    gPatentLibrary.setStatusKey("1");
-    gPatentLibrary.setReserveUserId(null);
-    gPatentLibraryMapper.updateGPatentLibrary(gPatentLibrary);
+
+    GPatenLibraryLineUp libraryLineUp = new GPatenLibraryLineUp();
+    libraryLineUp.setgPatentId(gPatentLibrary.getId());
+    List<GPatenLibraryLineUp> gPatenLibraryLineUps = libraryLineUpMapper.selectGPatenLibraryLineUpList(libraryLineUp);
+    if (gPatenLibraryLineUps.isEmpty()) {
+      gPatentLibraryMapper.cancelReserve(gPatentLibrary.getId());
+      return;
+    }
+
+    GPatenLibraryLineUp gPatenLibraryLineUp = gPatenLibraryLineUps.stream().min(Comparator.comparingLong(GPatenLibraryLineUp::getLineUpNum)).orElse(null);
+    SysUser sysUser = userMapper.selectUserById(gPatenLibraryLineUp.getUserId());
+
+
+    gPatentLibrary.setBookerKey(gPatenLibraryLineUp.getUserId());
+    if (Objects.nonNull(sysUser) && Objects.nonNull(sysUser.getNickName())) {
+      gPatentLibrary.setBookerValue(sysUser.getNickName());
+    }
+
+    gPatentLibrary.setBookerTime(new Date());
+    int i = gPatentLibraryMapper.updateGPatentLibrary(gPatentLibrary);
+    if (i > 0) {
+      this.cancelLineUpReserve(gPatenLibraryLineUp.getId(), gPatenLibraryLineUp.getUserId());
+    }
   }
 
   @Override
@@ -199,16 +225,16 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
   }
 
   @Override
-  public void cancelLineUpReserve(String id, LoginUser loginUser) {
+  public void cancelLineUpReserve(String id, Long userId) {
     GPatenLibraryLineUp libraryLineUp = new GPatenLibraryLineUp();
     libraryLineUp.setgPatentId(id);
-    libraryLineUp.setUserId(loginUser.getUserId());
+    libraryLineUp.setUserId(userId);
     List<GPatenLibraryLineUp> gPatenLibraryLineUps = libraryLineUpMapper.selectGPatenLibraryLineUpList(libraryLineUp);
     if (gPatenLibraryLineUps.isEmpty()) {
       throw new ServiceException("Queue record not found");
     }
 
-    int i = libraryLineUpMapper.deleteByUserAndPatent(id, loginUser.getUserId());
+    int i = libraryLineUpMapper.deleteByUserAndPatent(id, userId);
 
     if (i > 0) {
       libraryLineUpMapper.decrementQueueNumber(id, gPatenLibraryLineUps.get(0).getLineUpNum());

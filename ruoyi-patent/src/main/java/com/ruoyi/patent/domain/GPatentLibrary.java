@@ -148,14 +148,6 @@ public class GPatentLibrary extends BaseEntity {
   @Excel(name = "备注")
   private String remark;
 
-  public Long getReserveUserId() {
-    return reserveUserId;
-  }
-
-  public void setReserveUserId(Long reserveUserId) {
-    this.reserveUserId = reserveUserId;
-  }
-
   public String getGuidancePriceVo() {
     return guidancePriceVo;
   }

@@ -95,7 +95,7 @@ public class GPatentLibrary extends BaseEntity {
   /**
    * 预定人
    */
-  private String bookerKey;
+  private Long bookerKey;
 
   /**
    * 预定人值
@@ -112,13 +112,16 @@ public class GPatentLibrary extends BaseEntity {
    */
   private Date deadline;
 
-
   /**
-   * 预定人ID
+   * 预定时间
    */
-  private Long reserveUserId;
+  private Date bookerTime;
 
   private String guidancePriceVo;
+  /**
+   * 排队数
+   */
+  private Integer lineUpNum;
 
   /**
    * 搜索状态
@@ -265,11 +268,11 @@ public class GPatentLibrary extends BaseEntity {
     return statusValue;
   }
 
-  public void setBookerKey(String bookerKey) {
+  public void setBookerKey(Long bookerKey) {
     this.bookerKey = bookerKey;
   }
 
-  public String getBookerKey() {
+  public Long getBookerKey() {
     return bookerKey;
   }
 
@@ -305,6 +308,22 @@ public class GPatentLibrary extends BaseEntity {
   @Override
   public void setRemark(String remark) {
     this.remark = remark;
+  }
+
+  public Integer getLineUpNum() {
+    return lineUpNum;
+  }
+
+  public void setLineUpNum(Integer lineUpNum) {
+    this.lineUpNum = lineUpNum;
+  }
+
+  public Date getBookerTime() {
+    return bookerTime;
+  }
+
+  public void setBookerTime(Date bookerTime) {
+    this.bookerTime = bookerTime;
   }
 
   @Override

@@ -159,4 +159,14 @@ public class GPatentLibraryController extends BaseController {
     gPatentLibraryService.cancelLineUpReserve(id, loginUser);
     return success();
   }
+
+  /**
+   * 一件删除
+   */
+  @DeleteMapping("/all-delete")
+  public AjaxResult allDelete() {
+    LoginUser loginUser = getLoginUser();
+    gPatentLibraryService.allDelete(loginUser.getUserId().toString());
+    return success();
+  }
 }

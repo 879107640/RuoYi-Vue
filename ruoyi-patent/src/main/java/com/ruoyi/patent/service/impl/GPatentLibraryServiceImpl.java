@@ -50,7 +50,14 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
    */
   @Override
   public List<GPatentLibrary> selectGPatentLibraryList(GPatentLibrary gPatentLibrary) {
-    return gPatentLibraryMapper.selectGPatentLibraryList(gPatentLibrary);
+    List<GPatentLibrary> gPatentLibraries = gPatentLibraryMapper.selectGPatentLibraryList(gPatentLibrary);
+    for (GPatentLibrary patentLibrary : gPatentLibraries) {
+      GPatenLibraryLineUp gPatenLibraryLineUp = new GPatenLibraryLineUp();
+      gPatenLibraryLineUp.setgPatentId(patentLibrary.getId());
+      List<GPatenLibraryLineUp> gPatenLibraryLineUps = libraryLineUpMapper.selectGPatenLibraryLineUpList(gPatenLibraryLineUp);
+      patentLibrary.setLineUpNum(gPatenLibraryLineUps.size());
+    }
+    return gPatentLibraries;
   }
 
   /**
@@ -63,6 +70,10 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
   public int insertGPatentLibrary(GPatentLibrary gPatentLibrary) {
     gPatentLibrary.setCreateTime(DateUtils.getNowDate());
     gPatentLibrary.setId(UUID.randomUUID().toString());
+    GPatentLibrary isExit = gPatentLibraryMapper.selectGPatentLibraryByNo(gPatentLibrary.getPatentNo());
+    if (Objects.nonNull(isExit)) {
+      throw new ServiceException("该专利号已存在");
+    }
     return gPatentLibraryMapper.insertGPatentLibrary(gPatentLibrary);
   }
 
@@ -74,6 +85,10 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
    */
   @Override
   public int updateGPatentLibrary(GPatentLibrary gPatentLibrary) {
+    GPatentLibrary old = gPatentLibraryMapper.selectGPatentLibraryById(gPatentLibrary.getId());
+    if (Objects.nonNull(old) && !old.getPatentNo().equals(gPatentLibrary.getPatentNo())) {
+      throw new ServiceException("专利号不允许修改");
+    }
     gPatentLibrary.setUpdateTime(DateUtils.getNowDate());
     return gPatentLibraryMapper.updateGPatentLibrary(gPatentLibrary);
   }
@@ -129,7 +144,9 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
     }
 
     gPatentLibrary.setStatusKey("2");
-    gPatentLibrary.setReserveUserId(loginUser.getUserId());
+    gPatentLibrary.setBookerKey(loginUser.getUserId());
+    gPatentLibrary.setBookerValue(loginUser.getUser().getNickName());
+    gPatentLibrary.setBookerTime(new Date());
     gPatentLibraryMapper.updateGPatentLibrary(gPatentLibrary);
   }
 
@@ -170,11 +187,13 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
         throw new ServiceException("当前专利不允许重复排队");
       }
     }
+
+    Long lineUpNum = gPatenLibraryLineUps.stream().map(GPatenLibraryLineUp::getLineUpNum).max(Long::compare).orElse(0L);
     GPatenLibraryLineUp insert = new GPatenLibraryLineUp();
     insert.setUserId(loginUser.getUserId());
     insert.setCreatedTime(new Date());
     insert.setgPatentId(id);
-    insert.setLineUpNum((long) (gPatenLibraryLineUps.size() + 1));
+    insert.setLineUpNum(lineUpNum + 1);
     libraryLineUpMapper.insertGPatenLibraryLineUp(insert);
 
   }
@@ -194,5 +213,10 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
     if (i > 0) {
       libraryLineUpMapper.decrementQueueNumber(id, gPatenLibraryLineUps.get(0).getLineUpNum());
     }
+  }
+
+  @Override
+  public void allDelete(String username) {
+    gPatentLibraryMapper.allDelete(username);
   }
 }

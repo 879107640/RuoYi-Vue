@@ -78,4 +78,10 @@ public interface IGPatentLibraryService {
   void lineUpReserve(String id, LoginUser loginUser);
 
   void cancelLineUpReserve(String id, LoginUser loginUser);
+
+  /**
+   * 一件删除
+   * @param username 创建人id
+   */
+  void allDelete(String username);
 }

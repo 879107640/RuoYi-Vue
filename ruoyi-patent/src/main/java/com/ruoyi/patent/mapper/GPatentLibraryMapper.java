@@ -3,6 +3,7 @@ package com.ruoyi.patent.mapper;
 import java.util.List;
 
 import com.ruoyi.patent.domain.GPatentLibrary;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
 
 /**
@@ -61,4 +62,8 @@ public interface GPatentLibraryMapper {
   public int deleteGPatentLibraryByIds(String[] ids);
 
   GPatentLibrary selectGPatentLibraryByNo(@Param("patentNo") String patentNo);
+
+  @Delete("delete from g_patent_library where create_by = #{username}")
+  void allDelete(String username);
+
 }

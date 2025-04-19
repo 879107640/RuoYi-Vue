@@ -169,6 +169,8 @@
       </if>
       <if test="statusKey != null">status_key = #{statusKey},
       </if>
+      <if test="bookerTime != null">booker_time = #{bookerTime},
+      </if>
       <if test="statusValue != null">status_value = #{statusValue},
       </if>
       <if test="bookerKey != null">booker_key = #{bookerKey},

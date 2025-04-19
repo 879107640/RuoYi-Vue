@@ -10,6 +10,7 @@ import com.ruoyi.patent.domain.GPatentLibrary;
 import com.ruoyi.patent.mapper.GPatenLibraryLineUpMapper;
 import com.ruoyi.patent.mapper.GPatentLibraryMapper;
 import com.ruoyi.patent.service.IGPatentLibraryService;
+import com.ruoyi.patent.service.vo.GPatentLibrarySaveVo;
 import com.ruoyi.system.mapper.SysUserMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -244,5 +245,18 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
   @Override
   public void allDelete(String username) {
     gPatentLibraryMapper.allDelete(username);
+  }
+
+  @Override
+  @Transactional(rollbackFor = Exception.class)
+  public int batchAdd(GPatentLibrarySaveVo gPatentLibrary, Long userId) {
+    List<GPatentLibrary> gPatentLibraries = gPatentLibrary.getgPatentLibraryList();
+    int flag = 0;
+    for (GPatentLibrary patentLibrary : gPatentLibraries) {
+      patentLibrary.setCreateBy(userId.toString());
+      int i = this.insertGPatentLibrary(patentLibrary);
+      flag += i;
+    }
+    return flag == gPatentLibrary.getgPatentLibraryList().size() ? 1 : 0;
   }
 }

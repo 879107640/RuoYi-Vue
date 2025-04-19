@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.patent.domain.GPatentLibrary;
+import com.ruoyi.patent.service.vo.GPatentLibrarySaveVo;
 
 /**
  * 专利库数据Service接口
@@ -84,4 +85,12 @@ public interface IGPatentLibraryService {
    * @param username 创建人id
    */
   void allDelete(String username);
+
+  /**
+   * 批量新增
+   * @param gPatentLibrary
+   * @param userId
+   * @return
+   */
+  int batchAdd(GPatentLibrarySaveVo gPatentLibrary, Long userId);
 }

@@ -1,4 +1,4 @@
-package com.ruoyi.patent.controller;
+package com.ruoyi.web.controller.patent;
 
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;

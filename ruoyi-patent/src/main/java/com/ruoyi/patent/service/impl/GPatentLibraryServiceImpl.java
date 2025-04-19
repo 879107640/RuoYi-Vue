@@ -73,6 +73,7 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
    * @return 结果
    */
   @Override
+  @Transactional(rollbackFor = Exception.class)
   public int insertGPatentLibrary(GPatentLibrary gPatentLibrary) {
     gPatentLibrary.setCreateTime(DateUtils.getNowDate());
     gPatentLibrary.setId(UUID.randomUUID().toString());
@@ -90,6 +91,7 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
    * @return 结果
    */
   @Override
+  @Transactional(rollbackFor = Exception.class)
   public int updateGPatentLibrary(GPatentLibrary gPatentLibrary) {
     GPatentLibrary old = gPatentLibraryMapper.selectGPatentLibraryById(gPatentLibrary.getId());
     if (Objects.nonNull(old) && !old.getPatentNo().equals(gPatentLibrary.getPatentNo())) {
@@ -106,6 +108,7 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
    * @return 结果
    */
   @Override
+  @Transactional(rollbackFor = Exception.class)
   public int deleteGPatentLibraryByIds(String[] ids) {
     return gPatentLibraryMapper.deleteGPatentLibraryByIds(ids);
   }
@@ -117,11 +120,13 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
    * @return 结果
    */
   @Override
+  @Transactional(rollbackFor = Exception.class)
   public int deleteGPatentLibraryById(String id) {
     return gPatentLibraryMapper.deleteGPatentLibraryById(id);
   }
 
   @Override
+  @Transactional(rollbackFor = Exception.class)
   public String importGPatentLibrary(List<GPatentLibrary> gPatentLibraries, boolean updateSupport) {
     for (GPatentLibrary gPatentLibrary : gPatentLibraries) {
       GPatentLibrary oldGPatentLibrary = gPatentLibraryMapper.selectGPatentLibraryByNo(gPatentLibrary.getPatentNo());
@@ -197,6 +202,7 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
   }
 
   @Override
+  @Transactional(rollbackFor = Exception.class)
   public void lineUpReserve(String id, LoginUser loginUser) {
     GPatentLibrary gPatentLibrary = this.selectGPatentLibraryById(id);
     if (Objects.isNull(gPatentLibrary)) {
@@ -226,6 +232,7 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
   }
 
   @Override
+  @Transactional(rollbackFor = Exception.class)
   public void cancelLineUpReserve(String id, Long userId) {
     GPatenLibraryLineUp libraryLineUp = new GPatenLibraryLineUp();
     libraryLineUp.setgPatentId(id);
@@ -243,6 +250,7 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
   }
 
   @Override
+  @Transactional(rollbackFor = Exception.class)
   public void allDelete(String username) {
     gPatentLibraryMapper.allDelete(username);
   }

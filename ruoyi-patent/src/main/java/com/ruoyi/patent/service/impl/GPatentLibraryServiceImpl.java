@@ -1,9 +1,12 @@
 package com.ruoyi.patent.service.impl;
 
+import cn.hutool.core.lang.Snowflake;
+import com.ruoyi.common.config.SnowFlakeIdConfig;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.common.utils.uuid.IdUtils;
 import com.ruoyi.common.utils.uuid.UUID;
 import com.ruoyi.patent.domain.GPatenLibraryLineUp;
 import com.ruoyi.patent.domain.GPatentLibrary;
@@ -12,6 +15,7 @@ import com.ruoyi.patent.mapper.GPatentLibraryMapper;
 import com.ruoyi.patent.service.IGPatentLibraryService;
 import com.ruoyi.patent.service.vo.GPatentLibrarySaveVo;
 import com.ruoyi.system.mapper.SysUserMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +40,8 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
 
   @Resource
   SysUserMapper userMapper;
+  @Resource
+  SnowFlakeIdConfig snowFlakeIdConfig;
 
   /**
    * 查询专利库数据
@@ -197,7 +203,7 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
     gPatentLibrary.setBookerTime(new Date());
     int i = gPatentLibraryMapper.updateGPatentLibrary(gPatentLibrary);
     if (i > 0) {
-      this.cancelLineUpReserve(gPatenLibraryLineUp.getId(), gPatenLibraryLineUp.getUserId());
+      this.cancelLineUpReserve(gPatenLibraryLineUp.getgPatentId(), gPatenLibraryLineUp.getUserId());
     }
   }
 
@@ -210,6 +216,10 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
     }
     if (gPatentLibrary.getStatusKey().equals("1")) {
       throw new ServiceException("当前专利不需要预约排队");
+    }
+
+    if (Objects.equals(gPatentLibrary.getBookerKey(), loginUser.getUserId())) {
+      throw new ServiceException("该专利已预定，不需要排队预定");
     }
 
     GPatenLibraryLineUp libraryLineUp = new GPatenLibraryLineUp();
@@ -227,6 +237,7 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
     insert.setCreatedTime(new Date());
     insert.setgPatentId(id);
     insert.setLineUpNum(lineUpNum + 1);
+    insert.setId(snowFlakeIdConfig.propertyConfigurer().nextId());
     libraryLineUpMapper.insertGPatenLibraryLineUp(insert);
 
   }

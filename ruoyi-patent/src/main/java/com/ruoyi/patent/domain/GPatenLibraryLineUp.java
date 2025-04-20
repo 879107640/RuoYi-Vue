@@ -20,7 +20,7 @@ public class GPatenLibraryLineUp extends BaseEntity {
     /**
      * $column.columnComment
      */
-    private String id;
+    private Long id;
 
     /**
      * 专利主键
@@ -47,11 +47,11 @@ public class GPatenLibraryLineUp extends BaseEntity {
     @Excel(name = "创建时间", width = 30, dateFormat = "yyyy-MM-dd")
     private Date createdTime;
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 

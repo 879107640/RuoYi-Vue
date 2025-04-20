@@ -22,7 +22,11 @@
       <groupId>org.springframework</groupId>
       <artifactId>spring-context-support</artifactId>
     </dependency>
-
+    <dependency>
+      <groupId>cn.hutool</groupId>
+      <artifactId>hutool-core</artifactId>
+      <version>5.6.5</version>
+    </dependency>
     <!-- SpringWeb模块 -->
     <dependency>
       <groupId>org.springframework</groupId>

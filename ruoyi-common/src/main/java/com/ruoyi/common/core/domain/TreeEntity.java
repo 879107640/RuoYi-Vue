@@ -1,5 +1,7 @@
 package com.ruoyi.common.core.domain;
 
+import com.ruoyi.common.core.domain.entity.BaseEntity;
+
 import java.util.ArrayList;
 import java.util.List;
 

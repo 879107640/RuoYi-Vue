@@ -163,7 +163,8 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
       throw new ServiceException("专利不存在");
     }
 
-    if (Objects.nonNull(gPatentLibrary.getStatusKey()) && gPatentLibrary.getStatusKey().equals("2") && !Objects.equals(gPatentLibrary.getBookerKey(), loginUser.getUserId())) {
+    if (Objects.nonNull(gPatentLibrary.getStatusKey()) && gPatentLibrary.getStatusKey().equals("2") &&
+        !Objects.equals(gPatentLibrary.getBookerKey(), loginUser.getUserId())) {
       throw new ServiceException("当前专利已被预约，请点击排队预约");
     }
 
@@ -186,7 +187,7 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
       throw new ServiceException("当前状态不能被取消");
     }
 
-    if (Objects.nonNull(gPatentLibrary.getStatusKey()) && gPatentLibrary.getStatusKey().equals("2") && !Objects.equals(gPatentLibrary.getBookerKey(), loginUser.getUserId())) {
+    if (Objects.nonNull(gPatentLibrary.getStatusKey()) && !Objects.equals(gPatentLibrary.getBookerKey(), loginUser.getUserId())) {
       throw new ServiceException("无权取消当前专利预约");
     }
 
@@ -280,7 +281,6 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
     List<GPatentLibrary> gPatentLibraries = gPatentLibrary.getgPatentLibraryList();
     int flag = 0;
     for (GPatentLibrary patentLibrary : gPatentLibraries) {
-      patentLibrary.setCreateBy(userId.toString());
       int i = this.insertGPatentLibrary(patentLibrary);
       flag += i;
     }

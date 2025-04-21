@@ -16,6 +16,17 @@
   </description>
 
   <dependencies>
+    <!-- mybatis-plus -->
+    <dependency>
+      <groupId>com.baomidou</groupId>
+      <artifactId>mybatis-plus-boot-starter</artifactId>
+    </dependency>
+
+    <!--lombok-->
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+    </dependency>
 
     <!-- SpringBoot Web容器 -->
     <dependency>

@@ -68,10 +68,6 @@ public class GPatentLibraryController extends BaseController {
   @Log(title = "专利库数据", businessType = BusinessType.INSERT)
   @PostMapping("/add")
   public AjaxResult add(@RequestBody GPatentLibrary gPatentLibrary) {
-    LoginUser user = this.getLoginUser();
-    if (StringUtils.isNotEmpty(gPatentLibrary.getCreateBy()) && user != null) {
-      gPatentLibrary.setCreateBy(String.valueOf(user.getUserId()));
-    }
     return toAjax(gPatentLibraryService.insertGPatentLibrary(gPatentLibrary));
   }
 

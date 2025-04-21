@@ -1,44 +1,37 @@
 package com.ruoyi.framework.config;
 
+import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.core.io.support.ResourcePatternResolver;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
+import org.springframework.core.type.classreading.CachingMetadataReaderFactory;
+import org.springframework.core.type.classreading.MetadataReader;
+import org.springframework.core.type.classreading.MetadataReaderFactory;
+import org.springframework.util.ClassUtils;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import javax.sql.DataSource;
 
-import org.apache.ibatis.io.VFS;
-import org.apache.ibatis.session.SqlSessionFactory;
-import org.mybatis.spring.SqlSessionFactoryBean;
-import org.mybatis.spring.boot.autoconfigure.SpringBootVFS;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
-import org.springframework.core.io.DefaultResourceLoader;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import org.springframework.core.io.support.ResourcePatternResolver;
-import org.springframework.core.type.classreading.CachingMetadataReaderFactory;
-import org.springframework.core.type.classreading.MetadataReader;
-import org.springframework.core.type.classreading.MetadataReaderFactory;
-import org.springframework.util.ClassUtils;
-import com.ruoyi.common.utils.StringUtils;
-
-/**
- * Mybatis支持*匹配扫描包
- *
- * @author ruoyi
- */
 @Configuration
-public class MyBatisConfig {
-  @Autowired
-  private Environment env;
+public class MybatisPlusConfig {
 
   static final String DEFAULT_RESOURCE_PATTERN = "**/*.class";
 
+  @Autowired
+  private Environment env;
+
   public static String setTypeAliasesPackage(String typeAliasesPackage) {
-    ResourcePatternResolver resolver = (ResourcePatternResolver) new PathMatchingResourcePatternResolver();
+    ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
     MetadataReaderFactory metadataReaderFactory = new CachingMetadataReaderFactory(resolver);
     List<String> allResult = new ArrayList<String>();
     try {
@@ -78,7 +71,7 @@ public class MyBatisConfig {
 
   public Resource[] resolveMapperLocations(String[] mapperLocations) {
     ResourcePatternResolver resourceResolver = new PathMatchingResourcePatternResolver();
-    List<Resource> resources = new ArrayList<Resource>();
+    List<Resource> resources = new ArrayList<>();
     if (mapperLocations != null) {
       for (String mapperLocation : mapperLocations) {
         try {
@@ -92,19 +85,18 @@ public class MyBatisConfig {
     return resources.toArray(new Resource[resources.size()]);
   }
 
+  /**
+   * 新版配置
+   *
+   * @return
+   */
   @Bean
-  public SqlSessionFactory sqlSessionFactory(DataSource dataSource) throws Exception {
-    String typeAliasesPackage = env.getProperty("mybatis.typeAliasesPackage");
-    String mapperLocations = env.getProperty("mybatis.mapperLocations");
-    String configLocation = env.getProperty("mybatis.configLocation");
-    typeAliasesPackage = setTypeAliasesPackage(typeAliasesPackage);
-    VFS.addImplClass(SpringBootVFS.class);
-
-    final SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
-    sessionFactory.setDataSource(dataSource);
-    sessionFactory.setTypeAliasesPackage(typeAliasesPackage);
-    sessionFactory.setMapperLocations(resolveMapperLocations(StringUtils.split(mapperLocations, ",")));
-    sessionFactory.setConfigLocation(new DefaultResourceLoader().getResource(configLocation));
-    return sessionFactory.getObject();
+  public MybatisPlusInterceptor mybatisPlusInterceptor() {
+    MybatisPlusInterceptor mybatisPlusInterceptor = new MybatisPlusInterceptor();
+    //能够添加很多拦截器实现
+    mybatisPlusInterceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.MYSQL));
+    //乐观锁拦截器
+    mybatisPlusInterceptor.addInnerInterceptor(new OptimisticLockerInnerInterceptor());
+    return mybatisPlusInterceptor;
   }
 }

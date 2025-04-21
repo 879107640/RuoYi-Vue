@@ -2,10 +2,10 @@ package com.ruoyi.patent.domain;
 
 import java.math.BigDecimal;
 
+import com.ruoyi.common.core.domain.entity.BaseEntity;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.common.annotation.Excel;
-import com.ruoyi.common.core.domain.BaseEntity;
 
 /**
  * 推荐信息对象 g_purchase_recommend

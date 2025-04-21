@@ -142,6 +142,17 @@ public class GPatentLibraryController extends BaseController {
   }
 
   /**
+   * 延长时间
+   * @param id
+   */
+  @PutMapping("/reserve-time/{id}")
+  public AjaxResult reserveTime(@PathVariable("id") String id) {
+    LoginUser loginUser = getLoginUser();
+    gPatentLibraryService.reserveTime(id, loginUser.getUserId());
+    return success();
+  }
+
+  /**
    * 预定排队
    * @param id
    */

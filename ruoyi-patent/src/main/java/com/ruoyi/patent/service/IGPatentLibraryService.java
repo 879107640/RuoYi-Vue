@@ -93,4 +93,11 @@ public interface IGPatentLibraryService {
    * @return
    */
   int batchAdd(GPatentLibrarySaveVo gPatentLibrary, Long userId);
+
+  /**
+   * 延长时间
+   * @param id 专利id
+   * @param userId 用户id
+   */
+  void reserveTime(String id, Long userId);
 }

@@ -124,6 +124,19 @@ public class GPatentLibrary extends BaseEntity {
   private Integer lineUpNum;
 
   /**
+   * 是否预定
+   */
+  private Integer isBooker;
+
+  public Integer getIsBooker() {
+    return isBooker;
+  }
+
+  public void setIsBooker(Integer isBooker) {
+    this.isBooker = isBooker;
+  }
+
+  /**
    * 搜索状态
    */
   private String[] statusKeys;

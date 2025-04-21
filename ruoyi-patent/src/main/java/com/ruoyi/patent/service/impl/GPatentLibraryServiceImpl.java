@@ -6,6 +6,7 @@ import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.uuid.IdUtils;
 import com.ruoyi.common.utils.uuid.UUID;
 import com.ruoyi.patent.domain.GPatenLibraryLineUp;
@@ -68,6 +69,12 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
       gPatenLibraryLineUp.setgPatentId(patentLibrary.getId());
       List<GPatenLibraryLineUp> gPatenLibraryLineUps = libraryLineUpMapper.selectGPatenLibraryLineUpList(gPatenLibraryLineUp);
       patentLibrary.setLineUpNum(gPatenLibraryLineUps.size());
+      for (GPatenLibraryLineUp patenLibraryLineUp : gPatenLibraryLineUps) {
+        if (Objects.equals(patenLibraryLineUp.getUserId(), SecurityUtils.getUserId())) {
+          patentLibrary.setIsBooker(1);
+          break;
+        }
+      }
     }
     return gPatentLibraries;
   }
@@ -164,6 +171,7 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
     gPatentLibrary.setBookerKey(loginUser.getUserId());
     gPatentLibrary.setBookerValue(loginUser.getUser().getNickName());
     gPatentLibrary.setBookerTime(new Date());
+    gPatentLibrary.setDeadline(DateUtils.addDays(gPatentLibrary.getBookerTime(), 2));
     gPatentLibraryMapper.updateGPatentLibrary(gPatentLibrary);
   }
 
@@ -277,5 +285,26 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
       flag += i;
     }
     return flag == gPatentLibrary.getgPatentLibraryList().size() ? 1 : 0;
+  }
+
+  @Override
+  public void reserveTime(String id, Long userId) {
+    GPatentLibrary gPatentLibrary = this.selectGPatentLibraryById(id);
+    if (Objects.isNull(gPatentLibrary)) {
+      throw new ServiceException("专利不存在");
+    }
+
+    if (Objects.nonNull(gPatentLibrary.getStatusKey()) && !Objects.equals(gPatentLibrary.getStatusKey(), "2")) {
+      throw new ServiceException("专利暂未预定，不能延长天数");
+    }
+
+    if (Objects.nonNull(gPatentLibrary.getBookerKey()) && !Objects.equals(gPatentLibrary.getBookerKey(), userId)) {
+      SysUser sysUser = userMapper.selectUserById(userId);
+      throw new ServiceException("专利当前预订人为："+ sysUser.getNickName() + "，不能延长天数");
+    }
+
+    gPatentLibrary.setDeadline(DateUtils.addDays(gPatentLibrary.getDeadline(), 1));
+    gPatentLibraryMapper.updateGPatentLibrary(gPatentLibrary);
+
   }
 }

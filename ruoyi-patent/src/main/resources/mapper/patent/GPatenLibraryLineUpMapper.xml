@@ -81,7 +81,7 @@
   <!-- 更新后续排队号减1 -->
   <update id="decrementQueueNumber">
     UPDATE g_paten_library_line_up
-    SET queue_number = queue_number - 1
+    SET line_up_num = line_up_num - 1
     WHERE g_patent_id = #{patentId} AND line_up_num > #{lineUpNum}
   </update>
 

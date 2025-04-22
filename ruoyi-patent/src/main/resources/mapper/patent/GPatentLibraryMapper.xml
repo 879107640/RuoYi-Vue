@@ -72,9 +72,10 @@
           #{statusKey}
         </foreach>
       </if>
-      <if test="bookerKey != null  and bookerKey != ''">and booker_key = #{bookerKey}</if>
       <if test="createTime != null ">and DATE(create_time) = DATE(#{createTime})</if>
-      <if test="createBy != null  and createBy != ''">and create_by like concat('%', #{createBy}, '%')</if>
+      <if test="createBy != null  and createBy != ''">and create_by = #{createBy}</if>
+      <if test="forMeBooker != null  and forMeBooker == 1 ">or booker_key = 2</if>
+      <if test="bookerKey != null  and bookerKey != ''">and booker_key = #{bookerKey}</if>
     </where>
   </select>
 

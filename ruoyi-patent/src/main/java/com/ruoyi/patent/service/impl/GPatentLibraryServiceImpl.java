@@ -1,6 +1,7 @@
 package com.ruoyi.patent.service.impl;
 
 import cn.hutool.core.lang.Snowflake;
+import cn.hutool.core.util.StrUtil;
 import com.ruoyi.common.config.SnowFlakeIdConfig;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginUser;
@@ -63,6 +64,10 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
    */
   @Override
   public List<GPatentLibrary> selectGPatentLibraryList(GPatentLibrary gPatentLibrary) {
+    if (StrUtil.isNotEmpty(gPatentLibrary.getCreateBy()) && Objects.nonNull(gPatentLibrary.getBookerKey())) {
+      gPatentLibrary.setBookerKey(null);
+      gPatentLibrary.setForMeBooker(1);
+    }
     List<GPatentLibrary> gPatentLibraries = gPatentLibraryMapper.selectGPatentLibraryList(gPatentLibrary);
     for (GPatentLibrary patentLibrary : gPatentLibraries) {
       GPatenLibraryLineUp gPatenLibraryLineUp = new GPatenLibraryLineUp();

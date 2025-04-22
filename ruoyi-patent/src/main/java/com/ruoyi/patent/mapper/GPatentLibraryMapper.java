@@ -2,6 +2,8 @@ package com.ruoyi.patent.mapper;
 
 import java.util.List;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.ruoyi.common.core.domain.entity.BaseEntity;
 import com.ruoyi.patent.domain.GPatentLibrary;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
@@ -13,7 +15,7 @@ import org.apache.ibatis.annotations.Update;
  * @author hujch
  * @date 2025-04-10
  */
-public interface GPatentLibraryMapper {
+public interface GPatentLibraryMapper  {
   /**
    * 查询专利库数据
    *

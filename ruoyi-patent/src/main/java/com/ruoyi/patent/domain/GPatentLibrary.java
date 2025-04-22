@@ -128,6 +128,19 @@ public class GPatentLibrary extends BaseEntity {
    */
   private Integer isBooker;
 
+  /**
+   * 我的专利下我的预定
+   */
+  private Integer forMeBooker;
+
+  public Integer getForMeBooker() {
+    return forMeBooker;
+  }
+
+  public void setForMeBooker(Integer forMeBooker) {
+    this.forMeBooker = forMeBooker;
+  }
+
   public Integer getIsBooker() {
     return isBooker;
   }

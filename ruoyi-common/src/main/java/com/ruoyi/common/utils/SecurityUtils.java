@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.ruoyi.common.utils.spring.SpringUtils;
+import io.jsonwebtoken.Claims;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -13,6 +15,11 @@ import com.ruoyi.common.constant.HttpStatus;
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.exception.ServiceException;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * 安全服务工具类
@@ -20,6 +27,8 @@ import com.ruoyi.common.exception.ServiceException;
  * @author ruoyi
  */
 public class SecurityUtils {
+
+  private static final String REQUEST_ATTRIBUTE_LOGIN_USER_ID = "login_user_id";
 
   /**
    * 用户ID
@@ -150,5 +159,4 @@ public class SecurityUtils {
     return roles.stream().filter(StringUtils::hasText)
         .anyMatch(x -> Constants.SUPER_ADMIN.equals(x) || PatternMatchUtils.simpleMatch(x, role));
   }
-
 }

@@ -52,13 +52,9 @@
           #{item}
         </foreach>
       </if>
-      <!--<if test="patentTypeKey != null  and patentTypeKey != ''">and patent_type_key = #{patentTypeKey}</if>-->
       <if test="domain != null  and domain != ''">and domain = #{domain}</if>
       <if test="feeDate != null ">and fee_date = #{feeDate}</if>
-      <!--<if test="params.beginGuidancePrice != null and params.beginGuidancePrice != '' and params.endGuidancePrice != null and params.endGuidancePrice != ''">
-        and guidance_price between
-        #{params.beginGuidancePrice} and #{params.endGuidancePrice}
-      </if>-->
+
       <if test="minPrice != null and maxPrice != null">
         and guidance_price between
         CAST(#{minPrice} AS DECIMAL(10,2))

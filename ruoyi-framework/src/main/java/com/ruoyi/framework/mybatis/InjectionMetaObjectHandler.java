@@ -5,11 +5,16 @@ import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.ruoyi.common.core.domain.entity.BaseEntity;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.exception.ServiceException;
-import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.framework.web.service.TokenService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.reflection.MetaObject;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 
 /**
@@ -20,6 +25,9 @@ import java.util.Date;
 @Slf4j
 @Component
 public class InjectionMetaObjectHandler implements MetaObjectHandler {
+
+  @Resource
+  TokenService tokenService;
 
   /**
    * 插入填充方法，用于在插入数据时自动填充实体对象中的创建时间、更新时间、创建人、更新人等信息
@@ -78,9 +86,11 @@ public class InjectionMetaObjectHandler implements MetaObjectHandler {
           baseEntity.setUpdateTime(current);
 
           // 获取当前登录用户的ID，并填充更新人信息
-          String userId = SecurityUtils.getUsername();
-          if (ObjectUtil.isNotNull(userId)) {
-            baseEntity.setUpdateBy(userId);
+          if (getLoginUser() != null) {
+            String userId = getLoginUser().getUsername();
+            if (ObjectUtil.isNotNull(userId)) {
+              baseEntity.setUpdateBy(userId);
+            }
           }
         }
       } else {
@@ -92,20 +102,18 @@ public class InjectionMetaObjectHandler implements MetaObjectHandler {
     }
   }
 
-  /**
-   * 获取当前登录用户信息
-   *
-   * @return 当前登录用户的信息，如果用户未登录则返回 null
-   */
   private LoginUser getLoginUser() {
-    LoginUser loginUser;
-    try {
-      loginUser = SecurityUtils.getLoginUser();
-    } catch (Exception e) {
-      log.warn("自动注入警告 => 用户未登录");
+    HttpServletRequest request = getRequest();
+    return tokenService.getLoginUser(request);
+  }
+
+  public static HttpServletRequest getRequest() {
+    RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+    if (!(requestAttributes instanceof ServletRequestAttributes)) {
       return null;
     }
-    return loginUser;
+    ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) requestAttributes;
+    return servletRequestAttributes.getRequest();
   }
 
 }

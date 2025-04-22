@@ -26,19 +26,19 @@ public class GPatentLibrary extends BaseEntity {
   /**
    * 专利号
    */
-  @Excel(name = "专利号")
+  @Excel(name = "专利号", sort = 3)
   private String patentNo;
 
   /**
    * 专利名称
    */
-  @Excel(name = "专利名称")
+  @Excel(name = "专利名称", sort = 4)
   private String patentName;
 
   /**
    * 专利类型
    */
-  @Excel(name = "专利类型", readConverterExp = "1=授权未缴费发明,2=下证发明,3=授权未缴费实用,4=下证实用")
+  @Excel(name = "专利类型", readConverterExp = "1=授权未缴费发明,2=下证发明,3=授权未缴费实用,4=下证实用", sort = 1)
   private String patentTypeKey;
 
   /**
@@ -49,26 +49,26 @@ public class GPatentLibrary extends BaseEntity {
   /**
    * 领域
    */
-  @Excel(name = "领域")
+  @Excel(name = "领域", sort = 2)
   private String domain;
 
   /**
    * 缴费日期
    */
   @JsonFormat(pattern = "yyyy-MM-dd")
-  @Excel(name = "缴费日期")
+  @Excel(name = "缴费日期", sort = 5)
   private Date feeDate;
 
   /**
    * 指导价
    */
-  @Excel(name = "指导价")
+  @Excel(name = "指导价", sort = 6)
   private BigDecimal guidancePrice;
 
   /**
    * 是否报过高企
    */
-  @Excel(name = "是否报过高企", readConverterExp = "Y=是,N=否")
+  @Excel(name = "是否报过高企", combo = {"是", "否"}, readConverterExp = "Y=是,N=否", sort = 7)
   private String highTechReportedKey;
 
   /**
@@ -79,7 +79,7 @@ public class GPatentLibrary extends BaseEntity {
   /**
    * 资源方
    */
-  @Excel(name = "资源方")
+  @Excel(name = "资源方", sort = 8)
   private String resourceProvider;
 
   /**

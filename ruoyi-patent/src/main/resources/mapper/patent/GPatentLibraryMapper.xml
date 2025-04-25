@@ -186,6 +186,10 @@
       </if>
       <if test="updateBy != null">update_by = #{updateBy},
       </if>
+      <if test="soldUserId != null">sold_user_id = #{soldUserId},
+      </if>
+      <if test="soldTime != null">sold_time = #{soldTime},
+      </if>
     </trim>
     where id = #{id}
   </update>

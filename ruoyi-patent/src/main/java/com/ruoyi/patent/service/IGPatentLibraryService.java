@@ -100,4 +100,10 @@ public interface IGPatentLibraryService {
    * @param userId 用户id
    */
   void reserveTime(String id, Long userId);
+
+  /**
+   * 专利出售
+   * @param id 专利id
+   */
+  void soldPat(String id);
 }

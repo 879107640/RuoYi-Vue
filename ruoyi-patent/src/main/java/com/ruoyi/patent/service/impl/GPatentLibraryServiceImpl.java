@@ -312,4 +312,44 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
     gPatentLibraryMapper.updateGPatentLibrary(gPatentLibrary);
 
   }
+
+  @Override
+  @Transactional(rollbackFor = Exception.class)
+  public void soldPat(String id) {
+    GPatentLibrary gPatentLibrary = this.selectGPatentLibraryById(id);
+
+    if (Objects.isNull(gPatentLibrary)) {
+      throw new ServiceException("专利不存在");
+    }
+
+    if (gPatentLibrary.getBookerTime().getTime() < new Date().getTime()) {
+
+      List<GPatenLibraryLineUp> oneByGPatentIdAndUserId = libraryLineUpMapper.getOneByGPatentIdAndUserId(id);
+      if (Objects.isNull(oneByGPatentIdAndUserId)) {
+        throw new ServiceException("当前预订人预定专利时间已过期，暂未其他预订人。请确认！");
+      }
+
+      // 使用 Stream 查找最小值
+      GPatenLibraryLineUp minElement = oneByGPatentIdAndUserId.stream()
+          .min(Comparator.comparingLong(GPatenLibraryLineUp::getLineUpNum))
+          .orElse(null); // 如果列表为空，返回 null；也可以使用 orElseThrow 抛出异常
+
+      if (Objects.isNull(minElement)) {
+        throw new ServiceException("获取排队人失败，请联系管理员");
+      }
+
+      gPatentLibrary.setSoldUserId(minElement.getUserId());
+    } else {
+      gPatentLibrary.setSoldUserId(gPatentLibrary.getBookerKey());
+    }
+
+    gPatentLibrary.setStatusKey("3");
+    gPatentLibrary.setSoldTime(new Date());
+    gPatentLibraryMapper.updateGPatentLibrary(gPatentLibrary);
+  }
+
+
+  public static void main(String[] args) {
+    System.err.println(new Date().getTime());
+  }
 }

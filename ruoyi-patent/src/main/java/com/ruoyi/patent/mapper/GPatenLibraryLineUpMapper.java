@@ -3,6 +3,7 @@ package com.ruoyi.patent.mapper;
 
 import com.ruoyi.patent.domain.GPatenLibraryLineUp;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
@@ -70,9 +71,10 @@ public interface GPatenLibraryLineUpMapper {
 
   /**
    * 删除指定用户和专利的排队记录
-   * @param patentId
-   * @param userId
-   * @return
+   * @param patentId 专利id
    */
   int deleteByUserAndPatent(@Param("patentId") String patentId, @Param("userId") Long userId);
+
+  @Select("select * from g_paten_library_line_up where g_paten_library_line_up.g_patent_id = #{patentId}")
+  List<GPatenLibraryLineUp> getOneByGPatentIdAndUserId(@Param("patentId") String patentId);
 }

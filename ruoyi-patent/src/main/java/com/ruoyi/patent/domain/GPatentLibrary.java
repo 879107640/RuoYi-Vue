@@ -129,6 +129,33 @@ public class GPatentLibrary extends BaseEntity {
   private Integer isBooker;
 
   /**
+   * 出售人id
+   */
+  private Long soldUserId;
+
+
+  /**
+   * 出售时间
+   */
+  private Date soldTime;
+
+  public Date getSoldTime() {
+    return soldTime;
+  }
+
+  public void setSoldTime(Date soldTime) {
+    this.soldTime = soldTime;
+  }
+
+  public Long getSoldUserId() {
+    return soldUserId;
+  }
+
+  public void setSoldUserId(Long soldUserId) {
+    this.soldUserId = soldUserId;
+  }
+
+  /**
    * 我的专利下我的预定
    */
   private Integer forMeBooker;

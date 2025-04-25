@@ -91,6 +91,19 @@ public class GPatentLibraryController extends BaseController {
     return toAjax(gPatentLibraryService.updateGPatentLibrary(gPatentLibrary));
   }
 
+
+
+  /**
+   * 修改专利库数据
+   */
+  @Log(title = "专利库数据", businessType = BusinessType.UPDATE)
+  @PutMapping("/sold-pat/{id}")
+  public AjaxResult soldPat(@PathVariable("id") String id) {
+    gPatentLibraryService.soldPat(id);
+    return success();
+  }
+
+
   /**
    * 删除专利库数据
    */

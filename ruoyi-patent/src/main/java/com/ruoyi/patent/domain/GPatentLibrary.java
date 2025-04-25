@@ -133,11 +133,23 @@ public class GPatentLibrary extends BaseEntity {
    */
   private Long soldUserId;
 
+  /**
+   * 出售人名称
+   */
+  private String soldUserName;
 
   /**
    * 出售时间
    */
   private Date soldTime;
+
+  public String getSoldUserName() {
+    return soldUserName;
+  }
+
+  public void setSoldUserName(String soldUserName) {
+    this.soldUserName = soldUserName;
+  }
 
   public Date getSoldTime() {
     return soldTime;

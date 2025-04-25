@@ -91,12 +91,10 @@ public class GPatentLibraryController extends BaseController {
     return toAjax(gPatentLibraryService.updateGPatentLibrary(gPatentLibrary));
   }
 
-
-
   /**
-   * 修改专利库数据
+   * 专利出售
    */
-  @Log(title = "专利库数据", businessType = BusinessType.UPDATE)
+  @Log(title = "专利出售", businessType = BusinessType.UPDATE)
   @PutMapping("/sold-pat/{id}")
   public AjaxResult soldPat(@PathVariable("id") String id) {
     gPatentLibraryService.soldPat(id);

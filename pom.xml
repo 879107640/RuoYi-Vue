@@ -37,19 +37,56 @@
     <spring-framework.version>5.3.39</spring-framework.version>
     <mybatis-plus.version>3.5.2</mybatis-plus.version>
     <lombok.version>1.18.12</lombok.version>
-
+    <hutool.version>5.8.35</hutool.version>
+    <weixin-java.version>4.7.2.B</weixin-java.version>
+    <mapstruct.version>1.6.3</mapstruct.version>
   </properties>
 
   <!-- 依赖声明 -->
   <dependencyManagement>
     <dependencies>
+      <dependency>
+        <groupId>org.mapstruct</groupId>
+        <artifactId>mapstruct</artifactId> <!-- use mapstruct-jdk8 for Java 8 or higher -->
+        <version>${mapstruct.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mapstruct</groupId>
+        <artifactId>mapstruct-jdk8</artifactId>
+        <version>${mapstruct.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mapstruct</groupId>
+        <artifactId>mapstruct-processor</artifactId>
+        <version>${mapstruct.version}</version>
+      </dependency>
       <!--lombok-->
       <dependency>
         <groupId>org.projectlombok</groupId>
         <artifactId>lombok</artifactId>
         <version>${lombok.version}</version>
       </dependency>
+      <dependency>
+        <groupId>cn.hutool</groupId>
+        <artifactId>hutool-all</artifactId>
+        <version>${hutool.version}</version>
+      </dependency>
 
+      <dependency>
+        <groupId>com.github.binarywang</groupId>
+        <artifactId>weixin-java-pay</artifactId>
+        <version>${weixin-java.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.github.binarywang</groupId>
+        <artifactId>wx-java-mp-spring-boot-starter</artifactId>
+        <version>${weixin-java.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.github.binarywang</groupId>
+        <artifactId>wx-java-miniapp-spring-boot-starter</artifactId>
+        <version>${weixin-java.version}</version>
+      </dependency>
       <!-- mybatis-plus -->
       <dependency>
         <groupId>com.baomidou</groupId>
@@ -264,6 +301,7 @@
     <module>ruoyi-generator</module>
     <module>ruoyi-common</module>
     <module>ruoyi-patent</module>
+    <module>ruoyi-pay</module>
   </modules>
   <packaging>pom</packaging>
 

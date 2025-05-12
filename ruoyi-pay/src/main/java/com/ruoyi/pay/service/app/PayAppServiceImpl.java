@@ -40,7 +40,7 @@ public class PayAppServiceImpl implements PayAppService {
   private PayRefundService refundService;
 
   @Override
-  public Long createApp(PayAppCreateReqVO createReqVO) {
+  public int createApp(PayAppCreateReqVO createReqVO) {
     // 验证 appKey 是否重复
     validateAppKeyUnique(null, createReqVO.getAppKey());
 

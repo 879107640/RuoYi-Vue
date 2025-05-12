@@ -1,6 +1,6 @@
 package com.ruoyi.pay.convert.wallet;
 
-import cn.hutool.db.PageResult;
+import com.ruoyi.common.core.page.PageResult;
 import com.ruoyi.pay.domain.wallet.PayWalletDO;
 import com.ruoyi.pay.service.vo.wallet.AppPayWalletRespVO;
 import com.ruoyi.pay.service.vo.wallet.PayWalletRespVO;

@@ -1,14 +1,18 @@
 package com.ruoyi.pay.convert.order;
 
+import com.ruoyi.common.core.page.PageResult;
 import com.ruoyi.pay.config.core.client.dto.order.PayOrderRespDTO;
+import com.ruoyi.pay.config.core.client.dto.order.PayOrderUnifiedReqDTO;
+import com.ruoyi.pay.domain.app.PayAppDO;
 import com.ruoyi.pay.domain.order.PayOrderDO;
-import com.ruoyi.pay.service.vo.order.PayOrderDetailsRespVO;
-import com.ruoyi.pay.service.vo.order.PayOrderRespVO;
+import com.ruoyi.pay.domain.order.PayOrderExtensionDO;
+import com.ruoyi.pay.service.dto.PayOrderCreateReqDTO;
+import com.ruoyi.pay.service.vo.order.*;
+import com.ruoyi.pay.util.MapUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -34,23 +38,10 @@ public interface PayOrderConvert {
         return respVO;
     }
     PayOrderDetailsRespVO convertDetail(PayOrderDO bean);
+
     PayOrderDetailsRespVO.PayOrderExtension convert(PayOrderExtensionDO bean);
 
-    default PageResult<PayOrderPageItemRespVO> convertPage(PageResult<PayOrderDO> page, Map<Long, PayAppDO> appMap) {
-        PageResult<PayOrderPageItemRespVO> result = convertPage(page);
-        result.getList().forEach(order -> MapUtils.findAndThen(appMap, order.getAppId(), app -> order.setAppName(app.getName())));
-        return result;
-    }
     PageResult<PayOrderPageItemRespVO> convertPage(PageResult<PayOrderDO> page);
-
-    default List<PayOrderExcelVO> convertList(List<PayOrderDO> list, Map<Long, PayAppDO> appMap) {
-        return CollectionUtils.convertList(list, order -> {
-            PayOrderExcelVO excelVO = convertExcel(order);
-            MapUtils.findAndThen(appMap, order.getAppId(), app -> excelVO.setAppName(app.getName()));
-            return excelVO;
-        });
-    }
-    PayOrderExcelVO convertExcel(PayOrderDO bean);
 
     PayOrderDO convert(PayOrderCreateReqDTO bean);
 
@@ -60,8 +51,11 @@ public interface PayOrderConvert {
     PayOrderUnifiedReqDTO convert2(PayOrderSubmitReqVO reqVO, String userIp);
 
     @Mapping(source = "order.status", target = "status")
-    PayOrderSubmitRespVO convert(PayOrderDO order, com.george.cloud.framework.pay.core.client.dto.order.PayOrderRespDTO respDTO);
+    PayOrderSubmitRespVO convert(PayOrderDO order, PayOrderRespDTO respDTO);
 
-    AppPayOrderSubmitRespVO convert3(PayOrderSubmitRespVO bean);
-
+    default PageResult<PayOrderPageItemRespVO> convertPage(PageResult<PayOrderDO> page, Map<Long, PayAppDO> appMap) {
+        PageResult<PayOrderPageItemRespVO> result = convertPage(page);
+        result.getList().forEach(order -> MapUtils.findAndThen(appMap, order.getAppId(), app -> order.setAppName(app.getName())));
+        return result;
+    }
 }

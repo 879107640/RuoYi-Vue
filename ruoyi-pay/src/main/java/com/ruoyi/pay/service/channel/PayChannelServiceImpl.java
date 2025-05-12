@@ -54,7 +54,7 @@ public class PayChannelServiceImpl implements PayChannelService {
   }
 
   @Override
-  public Long createChannel(PayChannelCreateReqVO reqVO) {
+  public int createChannel(PayChannelCreateReqVO reqVO) {
     // 断言是否有重复的
     PayChannelDO dbChannel = getChannelByAppIdAndCode(reqVO.getAppId(), reqVO.getCode());
     if (dbChannel != null) {

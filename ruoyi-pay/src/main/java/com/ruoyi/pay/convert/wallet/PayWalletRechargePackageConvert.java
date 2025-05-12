@@ -1,6 +1,6 @@
 package com.ruoyi.pay.convert.wallet;
 
-import cn.hutool.db.PageResult;
+import com.ruoyi.common.core.page.PageResult;
 import com.ruoyi.pay.domain.wallet.PayWalletRechargePackageDO;
 import com.ruoyi.pay.service.vo.WalletRechargePackageCreateReqVO;
 import com.ruoyi.pay.service.vo.WalletRechargePackageRespVO;
@@ -13,16 +13,16 @@ import java.util.List;
 @Mapper
 public interface PayWalletRechargePackageConvert {
 
-    PayWalletRechargePackageConvert INSTANCE = Mappers.getMapper(PayWalletRechargePackageConvert.class);
+  PayWalletRechargePackageConvert INSTANCE = Mappers.getMapper(PayWalletRechargePackageConvert.class);
 
-    PayWalletRechargePackageDO convert(WalletRechargePackageCreateReqVO bean);
+  PayWalletRechargePackageDO convert(WalletRechargePackageCreateReqVO bean);
 
-    PayWalletRechargePackageDO convert(WalletRechargePackageUpdateReqVO bean);
+  PayWalletRechargePackageDO convert(WalletRechargePackageUpdateReqVO bean);
 
-    WalletRechargePackageRespVO convert(PayWalletRechargePackageDO bean);
+  WalletRechargePackageRespVO convert(PayWalletRechargePackageDO bean);
 
-    List<WalletRechargePackageRespVO> convertList(List<PayWalletRechargePackageDO> list);
+  List<WalletRechargePackageRespVO> convertList(List<PayWalletRechargePackageDO> list);
 
-    PageResult<WalletRechargePackageRespVO> convertPage(PageResult<PayWalletRechargePackageDO> page);
+  PageResult<WalletRechargePackageRespVO> convertPage(PageResult<PayWalletRechargePackageDO> page);
 
 }

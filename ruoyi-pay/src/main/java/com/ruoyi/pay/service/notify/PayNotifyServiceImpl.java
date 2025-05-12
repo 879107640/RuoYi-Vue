@@ -88,7 +88,7 @@ public class PayNotifyServiceImpl implements PayNotifyService {
 
   @Override
   @Transactional(rollbackFor = Exception.class)
-  public void createPayNotifyTask(Integer type, Long dataId, String orgCode) {
+  public void createPayNotifyTask(Integer type, Long dataId) {
     PayNotifyTaskDO task = new PayNotifyTaskDO().setType(type).setDataId(dataId);
     task.setStatus(PayNotifyStatusEnum.WAITING.getStatus()).setNextNotifyTime(LocalDateTime.now())
         .setNotifyTimes(0).setMaxNotifyTimes(PayNotifyTaskDO.NOTIFY_FREQUENCY.length + 1);

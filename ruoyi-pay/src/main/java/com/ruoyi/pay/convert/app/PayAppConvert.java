@@ -1,6 +1,6 @@
 package com.ruoyi.pay.convert.app;
 
-import cn.hutool.db.PageResult;
+import com.ruoyi.common.core.page.PageResult;
 import com.ruoyi.common.utils.collection.CollectionUtils;
 import com.ruoyi.pay.domain.app.PayAppDO;
 import com.ruoyi.pay.domain.channel.PayChannelDO;
@@ -37,5 +37,11 @@ public interface PayAppConvert {
 
   PageResult<PayAppPageItemRespVO> convertPage(PageResult<PayAppDO> page);
 
-
+  default PageResult<PayAppPageItemRespVO> convertPage(PageResult<PayAppDO> pageResult, List<PayChannelDO> channels) {
+    PageResult<PayAppPageItemRespVO> voPageResult = convertPage(pageResult);
+    // 处理 channel 关系
+    Map<Long, Set<String>> appIdChannelMap = CollectionUtils.convertMultiMap2(channels, PayChannelDO::getAppId, PayChannelDO::getCode);
+    voPageResult.getList().forEach(app -> app.setChannelCodes(appIdChannelMap.get(app.getId())));
+    return voPageResult;
+  }
 }

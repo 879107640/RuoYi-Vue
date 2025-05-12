@@ -66,6 +66,12 @@
       <groupId>com.ruoyi</groupId>
       <artifactId>ruoyi-patent</artifactId>
     </dependency>
+      <dependency>
+          <groupId>com.ruoyi</groupId>
+          <artifactId>ruoyi-pay</artifactId>
+          <version>3.8.9</version>
+          <scope>compile</scope>
+      </dependency>
 
   </dependencies>
 

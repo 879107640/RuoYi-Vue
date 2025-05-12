@@ -24,7 +24,7 @@ public interface PayChannelService {
    * @param createReqVO 创建信息
    * @return 编号
    */
-  Long createChannel(@Valid PayChannelCreateReqVO createReqVO);
+  int createChannel(@Valid PayChannelCreateReqVO createReqVO);
 
   /**
    * 更新支付渠道

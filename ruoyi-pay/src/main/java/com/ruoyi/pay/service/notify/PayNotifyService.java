@@ -19,7 +19,7 @@ public interface PayNotifyService {
      * @param type 类型
      * @param dataId 数据编号
      */
-    void createPayNotifyTask(Integer type, Long dataId, String orgCode);
+    void createPayNotifyTask(Integer type, Long dataId);
 
     /**
      * 执行回调通知

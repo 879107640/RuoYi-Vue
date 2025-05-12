@@ -1,9 +1,10 @@
 package com.ruoyi.pay.service.wallet;
 
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.db.PageResult;
+import com.ruoyi.common.core.page.PageResult;
 import com.ruoyi.common.enums.CommonStatusEnum;
 import com.ruoyi.common.exception.ServiceException;
+import com.ruoyi.pay.convert.wallet.PayWalletRechargePackageConvert;
 import com.ruoyi.pay.domain.wallet.PayWalletRechargePackageDO;
 import com.ruoyi.pay.mapper.wallet.PayWalletRechargePackageMapper;
 import com.ruoyi.pay.service.vo.WalletRechargePackageCreateReqVO;
@@ -76,10 +77,10 @@ public class PayWalletRechargePackageServiceImpl implements PayWalletRechargePac
             return ;
         }
         if (id == null) {
-            throw exception(WALLET_RECHARGE_PACKAGE_NAME_EXISTS);
+            throw new ServiceException("钱包充值套餐名称已存在");
         }
         if (!id.equals(rechargePackage.getId())) {
-            throw exception(WALLET_RECHARGE_PACKAGE_NAME_EXISTS);
+            throw new ServiceException("钱包充值套餐名称已存在");
         }
     }
 
@@ -93,7 +94,7 @@ public class PayWalletRechargePackageServiceImpl implements PayWalletRechargePac
 
     private void validateWalletRechargePackageExists(Long id) {
         if (walletRechargePackageMapper.selectById(id) == null) {
-            throw exception(WALLET_RECHARGE_PACKAGE_NOT_FOUND);
+            throw new ServiceException("钱包充值套餐不存在");
         }
     }
 

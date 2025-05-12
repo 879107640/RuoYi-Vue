@@ -1,7 +1,7 @@
 package com.ruoyi.pay.service.app;
 
 
-import cn.hutool.db.PageResult;
+import com.ruoyi.common.core.page.PageResult;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.collection.CollectionUtils;
 import com.ruoyi.pay.domain.app.PayAppDO;

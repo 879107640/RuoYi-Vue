@@ -1,10 +1,10 @@
 package com.ruoyi.pay.convert.wallet;
 
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.pay.controller.admin.wallet.vo.rechargepackage.WalletRechargePackageCreateReqVO;
-import cn.iocoder.yudao.module.pay.controller.admin.wallet.vo.rechargepackage.WalletRechargePackageRespVO;
-import cn.iocoder.yudao.module.pay.controller.admin.wallet.vo.rechargepackage.WalletRechargePackageUpdateReqVO;
-import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletRechargePackageDO;
+import cn.hutool.db.PageResult;
+import com.ruoyi.pay.domain.wallet.PayWalletRechargePackageDO;
+import com.ruoyi.pay.service.vo.WalletRechargePackageCreateReqVO;
+import com.ruoyi.pay.service.vo.WalletRechargePackageRespVO;
+import com.ruoyi.pay.service.vo.WalletRechargePackageUpdateReqVO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

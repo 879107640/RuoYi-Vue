@@ -1,7 +1,7 @@
 package com.ruoyi.pay.config.core.enums.transfer;
 
 import cn.hutool.core.util.ArrayUtil;
-import cn.iocoder.yudao.framework.common.core.ArrayValuable;
+import com.ruoyi.common.core.core.ArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

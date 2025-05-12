@@ -1,9 +1,13 @@
 package com.ruoyi.pay.service.app;
 
-import cn.hutool.db.PageResult;
+import com.ruoyi.common.core.page.PageResult;
 import com.ruoyi.common.enums.CommonStatusEnum;
+import com.ruoyi.common.exception.ServiceException;
+import com.ruoyi.pay.convert.app.PayAppConvert;
 import com.ruoyi.pay.domain.app.PayAppDO;
 import com.ruoyi.pay.mapper.app.PayAppMapper;
+import com.ruoyi.pay.service.order.PayOrderService;
+import com.ruoyi.pay.service.refund.PayRefundService;
 import com.ruoyi.pay.service.vo.PayAppCreateReqVO;
 import com.ruoyi.pay.service.vo.PayAppPageReqVO;
 import com.ruoyi.pay.service.vo.PayAppUpdateReqVO;
@@ -66,10 +70,10 @@ public class PayAppServiceImpl implements PayAppService {
     }
     // 如果 id 为空，说明不用比较是否为相同 appKey 的应用
     if (id == null) {
-      throw exception(APP_KEY_EXISTS);
+      throw new ServiceException("支付应用标识已经存在");
     }
     if (!app.getId().equals(id)) {
-      throw exception(APP_KEY_EXISTS);
+      throw new ServiceException("支付应用标识已经存在");
     }
   }
 
@@ -78,7 +82,10 @@ public class PayAppServiceImpl implements PayAppService {
     // 校验商户存在
     validateAppExists(id);
     // 更新状态
-    appMapper.updateById(new PayAppDO().setId(id).setStatus(status));
+    PayAppDO payAppDO = new PayAppDO();
+    payAppDO.setId(id);
+    payAppDO.setStatus(status);
+    appMapper.updateById(payAppDO);
   }
 
   @Override
@@ -87,10 +94,10 @@ public class PayAppServiceImpl implements PayAppService {
     validateAppExists(id);
     // 校验关联数据是否存在
     if (orderService.getOrderCountByAppId(id) > 0) {
-      throw exception(APP_EXIST_ORDER_CANT_DELETE);
+      throw new ServiceException("支付应用存在支付订单，无法删除");
     }
     if (refundService.getRefundCountByAppId(id) > 0) {
-      throw exception(APP_EXIST_REFUND_CANT_DELETE);
+      throw new ServiceException("支付应用存在退款订单，无法删除");
     }
 
     // 删除
@@ -99,7 +106,7 @@ public class PayAppServiceImpl implements PayAppService {
 
   private void validateAppExists(Long id) {
     if (appMapper.selectById(id) == null) {
-      throw exception(APP_NOT_FOUND);
+      throw new ServiceException("App 不存在");
     }
   }
 
@@ -144,11 +151,11 @@ public class PayAppServiceImpl implements PayAppService {
   private PayAppDO validatePayApp(PayAppDO app) {
     // 校验是否存在
     if (app == null) {
-      throw exception(ErrorCodeConstants.APP_NOT_FOUND);
+      throw new ServiceException("App 不存在");
     }
     // 校验是否禁用
     if (CommonStatusEnum.isDisable(app.getStatus())) {
-      throw exception(ErrorCodeConstants.APP_IS_DISABLE);
+      throw new ServiceException("App 已经被禁用");
     }
     return app;
   }

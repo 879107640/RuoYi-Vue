@@ -2,6 +2,8 @@ package com.ruoyi.pay.convert.wallet;
 
 import cn.hutool.db.PageResult;
 import com.ruoyi.pay.domain.wallet.PayWalletDO;
+import com.ruoyi.pay.service.vo.wallet.AppPayWalletRespVO;
+import com.ruoyi.pay.service.vo.wallet.PayWalletRespVO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

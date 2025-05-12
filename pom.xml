@@ -40,11 +40,41 @@
     <hutool.version>5.8.35</hutool.version>
     <weixin-java.version>4.7.2.B</weixin-java.version>
     <mapstruct.version>1.6.3</mapstruct.version>
+    <dynamic-datasource.version>4.3.1</dynamic-datasource.version>
+    <knife4j.version>4.6.0</knife4j.version>
+    <springdoc.version>2.7.0</springdoc.version>
+    <redisson.version>3.41.0</redisson.version>
+    <weixin-java.version>4.6.0</weixin-java.version>
   </properties>
 
   <!-- 依赖声明 -->
   <dependencyManagement>
     <dependencies>
+      <dependency>
+        <groupId>org.redisson</groupId>
+        <artifactId>redisson-spring-boot-starter</artifactId>
+        <version>${redisson.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.github.xingfudeshi</groupId> <!-- TODO centre：https://github.com/xiaoymin/knife4j/issues/874 -->
+        <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
+        <version>${knife4j.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springdoc</groupId>
+        <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
+        <version>${springdoc.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.github.xiaoymin</groupId> <!-- 接口文档 UI：knife4j【网关专属】 -->
+        <artifactId>knife4j-gateway-spring-boot-starter</artifactId>
+        <version>4.5.0</version> <!-- TODO centre：等 4.5.0 => 4.6.0 -->
+      </dependency>
+      <dependency>
+        <groupId>com.baomidou</groupId>
+        <artifactId>dynamic-datasource-spring-boot3-starter</artifactId> <!-- 多数据源 -->
+        <version>${dynamic-datasource.version}</version>
+      </dependency>
       <dependency>
         <groupId>org.mapstruct</groupId>
         <artifactId>mapstruct</artifactId> <!-- use mapstruct-jdk8 for Java 8 or higher -->
@@ -301,7 +331,7 @@
     <module>ruoyi-generator</module>
     <module>ruoyi-common</module>
     <module>ruoyi-patent</module>
-    <module>ruoyi-pay</module>
+<!--    <module>ruoyi-pay</module>-->
   </modules>
   <packaging>pom</packaging>
 

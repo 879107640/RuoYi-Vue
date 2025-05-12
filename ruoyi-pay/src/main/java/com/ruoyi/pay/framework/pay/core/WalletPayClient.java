@@ -1,8 +1,11 @@
 package com.ruoyi.pay.framework.pay.core;
 
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.extra.spring.SpringUtil;
+import com.ruoyi.common.enums.order.PayOrderStatusEnum;
+import com.ruoyi.common.enums.wallet.PayWalletBizTypeEnum;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.pay.config.core.client.dto.order.PayOrderRespDTO;
 import com.ruoyi.pay.config.core.client.dto.order.PayOrderUnifiedReqDTO;
@@ -14,6 +17,13 @@ import com.ruoyi.pay.config.core.client.impl.NonePayClientConfig;
 import com.ruoyi.pay.config.core.enums.channel.PayChannelEnum;
 import com.ruoyi.pay.config.core.enums.refund.PayRefundStatusRespEnum;
 import com.ruoyi.pay.config.core.enums.transfer.PayTransferTypeEnum;
+import com.ruoyi.pay.domain.order.PayOrderExtensionDO;
+import com.ruoyi.pay.domain.refund.PayRefundDO;
+import com.ruoyi.pay.domain.wallet.PayWalletTransactionDO;
+import com.ruoyi.pay.service.order.PayOrderService;
+import com.ruoyi.pay.service.refund.PayRefundService;
+import com.ruoyi.pay.service.wallet.PayWalletService;
+import com.ruoyi.pay.service.wallet.PayWalletTransactionService;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
@@ -60,8 +70,8 @@ public class WalletPayClient extends AbstractPayClient<NonePayClientConfig> {
       Assert.notNull(userType, "用户类型不能为空");
       PayWalletTransactionDO transaction = wallService.orderPay(userId, userType, reqDTO.getOutTradeNo(),
           reqDTO.getPrice());
-      return PayOrderRespDTO.successOf(transaction.getNo(), transaction.getCreator(),
-          transaction.getCreateTime(),
+      return PayOrderRespDTO.successOf(transaction.getNo(), transaction.getCreateBy(),
+          LocalDateTimeUtil.of(transaction.getCreateTime()),
           reqDTO.getOutTradeNo(), transaction);
     } catch (Throwable ex) {
       log.error("[doUnifiedOrder] 失败", ex);
@@ -90,8 +100,8 @@ public class WalletPayClient extends AbstractPayClient<NonePayClientConfig> {
     PayOrderExtensionDO orderExtension = orderService.getOrderExtensionByNo(outTradeNo);
     // 支付交易拓展单不存在， 返回关闭状态
     if (orderExtension == null) {
-      return PayOrderRespDTO.closedOf(String.valueOf(PAY_ORDER_EXTENSION_NOT_FOUND.getCode()),
-          PAY_ORDER_EXTENSION_NOT_FOUND.getMsg(), outTradeNo, "");
+      return PayOrderRespDTO.closedOf(String.valueOf("1_007_003_000"),
+          "支付交易拓展单不存在", outTradeNo, "");
     }
     // 关闭状态
     if (PayOrderStatusEnum.isClosed(orderExtension.getStatus())) {
@@ -103,8 +113,8 @@ public class WalletPayClient extends AbstractPayClient<NonePayClientConfig> {
       PayWalletTransactionDO walletTransaction = walletTransactionService.getWalletTransaction(
           String.valueOf(orderExtension.getOrderId()), PayWalletBizTypeEnum.PAYMENT);
       Assert.notNull(walletTransaction, "支付单 {} 钱包流水不能为空", outTradeNo);
-      return PayOrderRespDTO.successOf(walletTransaction.getNo(), walletTransaction.getCreator(),
-          walletTransaction.getCreateTime(), outTradeNo, walletTransaction);
+      return PayOrderRespDTO.successOf(walletTransaction.getNo(), walletTransaction.getCreateBy(),
+          LocalDateTimeUtil.of(walletTransaction.getCreateTime()), outTradeNo, walletTransaction);
     }
     // 其它状态为无效状态
     log.error("[doGetOrder] 支付单 {} 的状态不正确", outTradeNo);
@@ -116,12 +126,12 @@ public class WalletPayClient extends AbstractPayClient<NonePayClientConfig> {
     try {
       PayWalletTransactionDO payWalletTransaction = wallService.orderRefund(reqDTO.getOutRefundNo(),
           reqDTO.getRefundPrice(), reqDTO.getReason());
-      return PayRefundRespDTO.successOf(payWalletTransaction.getNo(), payWalletTransaction.getCreateTime(),
+      return PayRefundRespDTO.successOf(payWalletTransaction.getNo(), LocalDateTimeUtil.of(payWalletTransaction.getCreateTime()),
           reqDTO.getOutRefundNo(), payWalletTransaction);
     } catch (Throwable ex) {
       log.error("[doUnifiedRefund] 失败", ex);
-      Integer errorCode = INTERNAL_SERVER_ERROR.getCode();
-      String errorMsg = INTERNAL_SERVER_ERROR.getMsg();
+      Integer errorCode = INTERNAL_SERVER_ERROR.value();
+      String errorMsg = INTERNAL_SERVER_ERROR.getReasonPhrase();
       if (ex instanceof ServiceException) {
         ServiceException serviceException = (ServiceException) ex;
         errorCode = serviceException.getCode();
@@ -145,7 +155,7 @@ public class WalletPayClient extends AbstractPayClient<NonePayClientConfig> {
     PayRefundDO payRefund = refundService.getRefundByNo(outRefundNo);
     // 支付退款单不存在， 返回退款失败状态
     if (payRefund == null) {
-      return PayRefundRespDTO.failureOf(String.valueOf(REFUND_NOT_FOUND), REFUND_NOT_FOUND.getMsg(),
+      return PayRefundRespDTO.failureOf("1_007_006_004", "支付退款单不存在",
           outRefundNo, "");
     }
     // 退款失败
@@ -158,7 +168,7 @@ public class WalletPayClient extends AbstractPayClient<NonePayClientConfig> {
       PayWalletTransactionDO walletTransaction = walletTransactionService.getWalletTransaction(
           String.valueOf(payRefund.getId()), PayWalletBizTypeEnum.PAYMENT_REFUND);
       Assert.notNull(walletTransaction, "支付退款单 {} 钱包流水不能为空", outRefundNo);
-      return PayRefundRespDTO.successOf(walletTransaction.getNo(), walletTransaction.getCreateTime(),
+      return PayRefundRespDTO.successOf(walletTransaction.getNo(), LocalDateTimeUtil.of(walletTransaction.getCreateTime()),
           outRefundNo, walletTransaction);
     }
     // 其它状态为无效状态

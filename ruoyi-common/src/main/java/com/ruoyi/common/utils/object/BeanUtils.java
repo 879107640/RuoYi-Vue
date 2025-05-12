@@ -2,6 +2,7 @@ package com.ruoyi.common.utils.object;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.db.PageResult;
+import com.ruoyi.common.utils.collection.CollectionUtils;
 
 import java.util.List;
 import java.util.function.Consumer;

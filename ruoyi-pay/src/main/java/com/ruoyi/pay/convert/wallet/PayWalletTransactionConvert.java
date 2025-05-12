@@ -1,19 +1,15 @@
 package com.ruoyi.pay.convert.wallet;
 
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.pay.controller.admin.wallet.vo.transaction.PayWalletTransactionRespVO;
-import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletTransactionDO;
-import cn.iocoder.yudao.module.pay.service.wallet.bo.WalletTransactionCreateReqBO;
+import com.ruoyi.pay.domain.wallet.PayWalletTransactionDO;
+import com.ruoyi.pay.service.wallet.bo.WalletTransactionCreateReqBO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
 @Mapper
 public interface PayWalletTransactionConvert {
 
-    PayWalletTransactionConvert INSTANCE = Mappers.getMapper(PayWalletTransactionConvert.class);
+  PayWalletTransactionConvert INSTANCE = Mappers.getMapper(PayWalletTransactionConvert.class);
 
-    PageResult<PayWalletTransactionRespVO> convertPage2(PageResult<PayWalletTransactionDO> page);
-
-    PayWalletTransactionDO convert(WalletTransactionCreateReqBO bean);
+  PayWalletTransactionDO convert(WalletTransactionCreateReqBO bean);
 
 }

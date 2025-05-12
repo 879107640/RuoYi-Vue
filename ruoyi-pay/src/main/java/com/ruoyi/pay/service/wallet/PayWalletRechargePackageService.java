@@ -1,7 +1,7 @@
 package com.ruoyi.pay.service.wallet;
 
 
-import cn.hutool.db.PageResult;
+import com.ruoyi.common.core.page.PageResult;
 import com.ruoyi.pay.domain.wallet.PayWalletRechargePackageDO;
 import com.ruoyi.pay.service.vo.WalletRechargePackageCreateReqVO;
 import com.ruoyi.pay.service.vo.WalletRechargePackagePageReqVO;

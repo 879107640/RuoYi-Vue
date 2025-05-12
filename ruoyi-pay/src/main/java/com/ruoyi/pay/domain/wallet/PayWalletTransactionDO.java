@@ -6,12 +6,14 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.ruoyi.common.core.domain.entity.BaseEntity;
 import com.ruoyi.common.enums.wallet.PayWalletBizTypeEnum;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * 会员钱包流水 DO
  *
  * @author jason
  */
+@EqualsAndHashCode(callSuper = true)
 @TableName(value = "pay_wallet_transaction")
 @KeySequence("pay_wallet_transaction_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data

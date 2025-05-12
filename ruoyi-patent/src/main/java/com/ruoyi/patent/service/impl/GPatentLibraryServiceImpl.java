@@ -17,6 +17,8 @@ import com.ruoyi.patent.mapper.GPatentLibraryMapper;
 import com.ruoyi.patent.service.IGPatentLibraryService;
 import com.ruoyi.patent.service.vo.GPatentLibrarySaveVo;
 import com.ruoyi.system.mapper.SysUserMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +36,7 @@ import java.util.Objects;
  */
 @Service
 public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
+  private static final Logger log = LoggerFactory.getLogger(GPatentLibraryServiceImpl.class);
   @Resource
   private GPatentLibraryMapper gPatentLibraryMapper;
 
@@ -158,7 +161,7 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
         gPatentLibraryMapper.updateGPatentLibrary(gPatentLibrary);
         continue;
       }
-      gPatentLibraryMapper.insertGPatentLibrary(gPatentLibrary);
+      insertGPatentLibrary(gPatentLibrary);
     }
 
     return "导入成功";
@@ -310,7 +313,7 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
 
     if (Objects.nonNull(gPatentLibrary.getBookerKey()) && !Objects.equals(gPatentLibrary.getBookerKey(), userId)) {
       SysUser sysUser = userMapper.selectUserById(userId);
-      throw new ServiceException("专利当前预订人为："+ sysUser.getNickName() + "，不能延长天数");
+      throw new ServiceException("专利当前预订人为：" + sysUser.getNickName() + "，不能延长天数");
     }
 
     gPatentLibrary.setDeadline(DateUtils.addDays(gPatentLibrary.getDeadline(), 1));

@@ -16,7 +16,11 @@
   </description>
 
   <dependencies>
-
+    <dependency>
+      <groupId>com.fasterxml.jackson.datatype</groupId>
+      <artifactId>jackson-datatype-jsr310</artifactId>
+      <scope>provided</scope> <!-- 设置为 provided，只有工具类需要使用到 -->
+    </dependency>
     <!-- Spring框架基本的核心工具 -->
     <dependency>
       <groupId>org.springframework</groupId>
@@ -25,7 +29,7 @@
     <dependency>
       <groupId>cn.hutool</groupId>
       <artifactId>hutool-core</artifactId>
-      <version>5.6.5</version>
+      <version>5.8.3</version>
     </dependency>
     <!-- SpringWeb模块 -->
     <dependency>
@@ -134,6 +138,10 @@
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
     </dependency>
+      <dependency>
+          <groupId>cn.hutool</groupId>
+          <artifactId>hutool-all</artifactId>
+      </dependency>
 
   </dependencies>
 

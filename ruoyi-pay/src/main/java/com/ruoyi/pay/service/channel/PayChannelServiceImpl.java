@@ -65,7 +65,7 @@ public class PayChannelServiceImpl implements PayChannelService {
     PayChannelDO channel = PayChannelConvert.INSTANCE.convert(reqVO);
     channel.setConfig(parseConfig(reqVO.getCode(), reqVO.getConfig()));
     payChannelMapper.insert(channel);
-    return channel.getId();
+    return channel.getId().intValue();
   }
 
   @Override

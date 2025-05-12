@@ -9,6 +9,7 @@ import com.ruoyi.pay.config.core.client.impl.alipay.*;
 import com.ruoyi.pay.config.core.client.impl.weixin.*;
 import com.ruoyi.pay.config.core.enums.channel.PayChannelEnum;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,6 +24,7 @@ import static com.ruoyi.pay.config.core.enums.channel.PayChannelEnum.*;
  * @author 芋道源码
  */
 @Slf4j
+@Component
 public class PayClientFactoryImpl implements PayClientFactory {
 
     /**

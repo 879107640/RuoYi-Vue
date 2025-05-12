@@ -6,6 +6,7 @@ import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.PageResult;
 import com.ruoyi.common.enums.order.PayOrderStatusEnum;
+import com.ruoyi.common.utils.ip.IpUtils;
 import com.ruoyi.common.utils.object.BeanUtils;
 import com.ruoyi.pay.config.core.enums.channel.PayChannelEnum;
 import com.ruoyi.pay.convert.order.PayOrderConvert;
@@ -33,7 +34,6 @@ import java.util.Map;
 import java.util.Objects;
 
 import static com.ruoyi.common.utils.collection.CollectionUtils.convertList;
-import static com.ruoyi.common.utils.servlet.ServletUtils.getClientIP;
 
 
 @Tag(name = "管理后台 - 支付订单")
@@ -95,7 +95,7 @@ public class PayOrderController extends BaseController {
     }
 
     // 2. 提交支付
-    PayOrderSubmitRespVO respVO = orderService.submitOrder(reqVO, getClientIP());
+    PayOrderSubmitRespVO respVO = orderService.submitOrder(reqVO, IpUtils.getIpAddr());
     return success(respVO);
   }
 

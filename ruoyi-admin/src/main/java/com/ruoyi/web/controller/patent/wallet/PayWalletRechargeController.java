@@ -2,6 +2,7 @@ package com.ruoyi.web.controller.patent.wallet;
 
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.utils.ip.IpUtils;
 import com.ruoyi.pay.service.dto.notify.dto.PayOrderNotifyReqDTO;
 import com.ruoyi.pay.service.dto.notify.dto.PayRefundNotifyReqDTO;
 import com.ruoyi.pay.service.wallet.PayWalletRechargeService;
@@ -15,8 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.annotation.security.PermitAll;
 import javax.validation.Valid;
-
-import static com.ruoyi.common.utils.servlet.ServletUtils.getClientIP;
 
 @Tag(name = "管理后台 - 钱包充值")
 @RestController
@@ -42,7 +41,7 @@ public class PayWalletRechargeController extends BaseController {
   @Operation(summary = "发起钱包充值退款")
   @Parameter(name = "id", description = "编号", required = true, example = "1024")
   public AjaxResult refundWalletRecharge(@RequestParam("id") Long id) {
-    walletRechargeService.refundWalletRecharge(id, getClientIP());
+    walletRechargeService.refundWalletRecharge(id, IpUtils.getIpAddr());
     return success(true);
   }
 

@@ -7,7 +7,6 @@ import com.ruoyi.pay.convert.wallet.PayWalletRechargePackageConvert;
 import com.ruoyi.pay.domain.wallet.PayWalletRechargePackageDO;
 import com.ruoyi.pay.service.vo.WalletRechargePackageCreateReqVO;
 import com.ruoyi.pay.service.vo.WalletRechargePackagePageReqVO;
-import com.ruoyi.pay.service.vo.WalletRechargePackageRespVO;
 import com.ruoyi.pay.service.vo.WalletRechargePackageUpdateReqVO;
 import com.ruoyi.pay.service.wallet.PayWalletRechargePackageService;
 import io.swagger.v3.oas.annotations.Operation;

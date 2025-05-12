@@ -48,7 +48,7 @@ public class PayAppServiceImpl implements PayAppService {
     PayAppDO app = PayAppConvert.INSTANCE.convert(createReqVO);
     appMapper.insert(app);
     // 返回
-    return app.getId();
+    return app.getId().intValue();
   }
 
   @Override

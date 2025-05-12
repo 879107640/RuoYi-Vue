@@ -1,210 +1,217 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
-    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.patent.mapper.GPatentLibraryMapper">
 
-  <resultMap type="GPatentLibrary" id="GPatentLibraryResult">
-    <result property="id" column="id"/>
-    <result property="patentNo" column="patent_no"/>
-    <result property="patentName" column="patent_name"/>
-    <result property="patentTypeKey" column="patent_type_key"/>
-    <result property="patentTypeValue" column="patent_type_value"/>
-    <result property="domain" column="domain"/>
-    <result property="feeDate" column="fee_date"/>
-    <result property="guidancePrice" column="guidance_price"/>
-    <result property="highTechReportedKey" column="high_tech_reported_key"/>
-    <result property="highTechReportedValue" column="high_tech_reported_value"/>
-    <result property="resourceProvider" column="resource_provider"/>
-    <result property="remark" column="remark"/>
-    <result property="statusKey" column="status_key"/>
-    <result property="statusValue" column="status_value"/>
-    <result property="bookerKey" column="booker_key"/>
-    <result property="bookerValue" column="booker_value"/>
-    <result property="days" column="days"/>
-    <result property="deadline" column="deadline"/>
-    <result property="createTime" column="create_time"/>
-    <result property="updateTime" column="update_time"/>
-    <result property="createBy" column="create_by"/>
-    <result property="updateBy" column="update_by"/>
-  </resultMap>
+    <resultMap type="GPatentLibrary" id="GPatentLibraryResult">
+        <result property="id" column="id"/>
+        <result property="patentNo" column="patent_no"/>
+        <result property="patentName" column="patent_name"/>
+        <result property="patentTypeKey" column="patent_type_key"/>
+        <result property="patentTypeValue" column="patent_type_value"/>
+        <result property="domain" column="domain"/>
+        <result property="feeDate" column="fee_date"/>
+        <result property="guidancePrice" column="guidance_price"/>
+        <result property="highTechReportedKey" column="high_tech_reported_key"/>
+        <result property="highTechReportedValue" column="high_tech_reported_value"/>
+        <result property="resourceProvider" column="resource_provider"/>
+        <result property="remark" column="remark"/>
+        <result property="statusKey" column="status_key"/>
+        <result property="statusValue" column="status_value"/>
+        <result property="bookerKey" column="booker_key"/>
+        <result property="bookerValue" column="booker_value"/>
+        <result property="days" column="days"/>
+        <result property="deadline" column="deadline"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateBy" column="update_by"/>
+    </resultMap>
 
-  <sql id="selectGPatentLibraryVo">
-    select id,
-           patent_no,
-           patent_name,
-           patent_type_key,
-           patent_type_value, domain, fee_date, guidance_price, high_tech_reported_key, high_tech_reported_value, resource_provider, remark, status_key, status_value, booker_key, booker_value, days, deadline, create_time, update_time
-    from g_patent_library
-  </sql>
+    <sql id="selectGPatentLibraryVo">
+        select id,
+               patent_no,
+               patent_name,
+               patent_type_key,
+               patent_type_value, domain, fee_date, guidance_price, high_tech_reported_key, high_tech_reported_value,
+               booker_time,
+            resource_provider, remark, status_key, status_value, booker_key, booker_value, days, deadline, create_time, update_time
+        from g_patent_library
+    </sql>
 
-  <select id="selectGPatentLibraryList" parameterType="GPatentLibrary" resultMap="GPatentLibraryResult">
-    <include refid="selectGPatentLibraryVo"/>
-    <where>
-      <if test="search != null  and search != ''">and ( patent_no like concat('%', #{search}, '%') or patent_name like concat('%', #{search}, '%') or domain like concat('%',
-        #{search}, '%') )
-      </if>
-      <if test="patentNo != null  and patentNo != ''">and patent_no = #{patentNo}</if>
-      <if test="patentName != null  and patentName != ''">and patent_name like concat('%', #{patentName}, '%')</if>
-      <if test="patentTypeKey != null and patentTypeKey != ''">
-        and patent_type_key in
-        <foreach item="item" index="index" collection="patentTypeKey.split(',')" open="(" separator="," close=")">
-          #{item}
+    <select id="selectGPatentLibraryList" parameterType="GPatentLibrary" resultMap="GPatentLibraryResult">
+        <include refid="selectGPatentLibraryVo"/>
+        <where>
+            <if test="search != null  and search != ''">and ( patent_no like concat('%', #{search}, '%') or patent_name
+                like concat('%', #{search}, '%') or domain like concat('%',
+                #{search}, '%') )
+            </if>
+            <if test="patentNo != null  and patentNo != ''">and patent_no = #{patentNo}</if>
+            <if test="patentName != null  and patentName != ''">and patent_name like concat('%', #{patentName}, '%')
+            </if>
+            <if test="patentTypeKey != null and patentTypeKey != ''">
+                and patent_type_key in
+                <foreach item="item" index="index" collection="patentTypeKey.split(',')" open="(" separator=","
+                         close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="domain != null  and domain != ''">and domain = #{domain}</if>
+            <if test="feeDate != null ">and fee_date = #{feeDate}</if>
+
+            <if test="minPrice != null and maxPrice != null">
+                and guidance_price between
+                CAST(#{minPrice} AS DECIMAL(10,2))
+                and CAST(#{maxPrice} AS DECIMAL(10,2))
+            </if>
+            <if test="highTechReportedKey != null  and highTechReportedKey != ''">and high_tech_reported_key =
+                #{highTechReportedKey}
+            </if>
+            <if test="resourceProvider != null  and resourceProvider != ''">and resource_provider like concat('%',
+                #{resourceProvider}, '%')
+            </if>
+            <if test="statusKeys != null and statusKeys.length > 0">
+                and status_key in
+                <foreach collection="statusKeys" item="statusKey" open="(" separator="," close=")">
+                    #{statusKey}
+                </foreach>
+            </if>
+            <if test="createTime != null ">and DATE(create_time) = DATE(#{createTime})</if>
+            <if test="createBy != null  and createBy != ''">and create_by = #{createBy}</if>
+            <if test="forMeBooker != null  and forMeBooker == 1 ">or booker_key = 2</if>
+            <if test="bookerKey != null  and bookerKey != ''">and booker_key = #{bookerKey}</if>
+        </where>
+    </select>
+
+    <select id="selectGPatentLibraryById" parameterType="String" resultMap="GPatentLibraryResult">
+        <include refid="selectGPatentLibraryVo"/>
+        where id = #{id}
+    </select>
+    <select id="selectGPatentLibraryByNo" resultType="com.ruoyi.patent.domain.GPatentLibrary">
+        select *
+        from g_patent_library
+        where patent_no = #{patentNo}
+    </select>
+
+    <insert id="insertGPatentLibrary" parameterType="GPatentLibrary" useGeneratedKeys="true" keyProperty="id">
+        insert into g_patent_library
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null and id != ''">id,</if>
+            <if test="patentNo != null and patentNo != ''">patent_no,</if>
+            <if test="patentName != null and patentName != ''">patent_name,</if>
+            <if test="patentTypeKey != null and patentTypeKey != ''">patent_type_key,</if>
+            <if test="patentTypeValue != null">patent_type_value,</if>
+            <if test="domain != null">domain,</if>
+            <if test="feeDate != null">fee_date,</if>
+            <if test="guidancePrice != null">guidance_price,</if>
+            <if test="highTechReportedKey != null">high_tech_reported_key,</if>
+            <if test="highTechReportedValue != null">high_tech_reported_value,</if>
+            <if test="resourceProvider != null and resourceProvider != ''">resource_provider,</if>
+            <if test="remark != null">remark,</if>
+            <if test="statusKey != null">status_key,</if>
+            <if test="statusValue != null">status_value,</if>
+            <if test="bookerKey != null">booker_key,</if>
+            <if test="bookerValue != null">booker_value,</if>
+            <if test="days != null">days,</if>
+            <if test="deadline != null">deadline,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="updateBy != null">update_by,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null and id != ''">#{id},</if>
+            <if test="patentNo != null and patentNo != ''">#{patentNo},</if>
+            <if test="patentName != null and patentName != ''">#{patentName},</if>
+            <if test="patentTypeKey != null and patentTypeKey != ''">#{patentTypeKey},</if>
+            <if test="patentTypeValue != null">#{patentTypeValue},</if>
+            <if test="domain != null">#{domain},</if>
+            <if test="feeDate != null">#{feeDate},</if>
+            <if test="guidancePrice != null">#{guidancePrice},</if>
+            <if test="highTechReportedKey != null">#{highTechReportedKey},</if>
+            <if test="highTechReportedValue != null">#{highTechReportedValue},</if>
+            <if test="resourceProvider != null and resourceProvider != ''">#{resourceProvider},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="statusKey != null">#{statusKey},</if>
+            <if test="statusValue != null">#{statusValue},</if>
+            <if test="bookerKey != null">#{bookerKey},</if>
+            <if test="bookerValue != null">#{bookerValue},</if>
+            <if test="days != null">#{days},</if>
+            <if test="deadline != null">#{deadline},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+        </trim>
+    </insert>
+
+    <update id="updateGPatentLibrary" parameterType="GPatentLibrary">
+        update g_patent_library
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="patentNo != null and patentNo != ''">patent_no = #{patentNo},
+            </if>
+            <if test="patentName != null and patentName != ''">patent_name = #{patentName},
+            </if>
+            <if test="patentTypeKey != null and patentTypeKey != ''">patent_type_key = #{patentTypeKey},
+            </if>
+            <if test="patentTypeValue != null">patent_type_value = #{patentTypeValue},
+            </if>
+            <if test="domain != null">domain = #{domain},
+            </if>
+            <if test="feeDate != null">fee_date = #{feeDate},
+            </if>
+            <if test="guidancePrice != null">guidance_price = #{guidancePrice},
+            </if>
+            <if test="highTechReportedKey != null">high_tech_reported_key = #{highTechReportedKey},
+            </if>
+            <if test="highTechReportedValue != null">high_tech_reported_value = #{highTechReportedValue},
+            </if>
+            <if test="resourceProvider != null and resourceProvider != ''">resource_provider = #{resourceProvider},
+            </if>
+            <if test="remark != null">remark = #{remark},
+            </if>
+            <if test="statusKey != null">status_key = #{statusKey},
+            </if>
+            <if test="bookerTime != null">booker_time = #{bookerTime},
+            </if>
+            <if test="statusValue != null">status_value = #{statusValue},
+            </if>
+            <if test="bookerKey != null">booker_key = #{bookerKey},
+            </if>
+            <if test="bookerValue != null">booker_value = #{bookerValue},
+            </if>
+            <if test="days != null">days = #{days},
+            </if>
+            <if test="deadline != null">deadline = #{deadline},
+            </if>
+            <if test="createTime != null">create_time = #{createTime},
+            </if>
+            <if test="updateTime != null">update_time = #{updateTime},
+            </if>
+            <if test="createBy != null">create_by = #{createBy},
+            </if>
+            <if test="updateBy != null">update_by = #{updateBy},
+            </if>
+            <if test="soldUserId != null">sold_user_id = #{soldUserId},
+            </if>
+            <if test="soldTime != null">sold_time = #{soldTime},
+            </if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteGPatentLibraryById" parameterType="Long">
+        delete
+        from g_patent_library
+        where id = #{id}
+    </delete>
+
+    <delete id="deleteGPatentLibraryByIds" parameterType="String">
+        delete from g_patent_library where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
         </foreach>
-      </if>
-      <if test="domain != null  and domain != ''">and domain = #{domain}</if>
-      <if test="feeDate != null ">and fee_date = #{feeDate}</if>
-
-      <if test="minPrice != null and maxPrice != null">
-        and guidance_price between
-        CAST(#{minPrice} AS DECIMAL(10,2))
-        and CAST(#{maxPrice} AS DECIMAL(10,2))
-      </if>
-      <if test="highTechReportedKey != null  and highTechReportedKey != ''">and high_tech_reported_key =
-        #{highTechReportedKey}
-      </if>
-      <if test="resourceProvider != null  and resourceProvider != ''">and resource_provider like concat('%',
-        #{resourceProvider}, '%')
-      </if>
-      <if test="statusKeys != null and statusKeys.length > 0">
-        and status_key in
-        <foreach collection="statusKeys" item="statusKey" open="(" separator="," close=")">
-          #{statusKey}
-        </foreach>
-      </if>
-      <if test="createTime != null ">and DATE(create_time) = DATE(#{createTime})</if>
-      <if test="createBy != null  and createBy != ''">and create_by = #{createBy}</if>
-      <if test="forMeBooker != null  and forMeBooker == 1 ">or booker_key = 2</if>
-      <if test="bookerKey != null  and bookerKey != ''">and booker_key = #{bookerKey}</if>
-    </where>
-  </select>
-
-  <select id="selectGPatentLibraryById" parameterType="String" resultMap="GPatentLibraryResult">
-    <include refid="selectGPatentLibraryVo"/>
-    where id = #{id}
-  </select>
-  <select id="selectGPatentLibraryByNo" resultType="com.ruoyi.patent.domain.GPatentLibrary">
-    select * from g_patent_library where patent_no = #{patentNo}
-  </select>
-
-  <insert id="insertGPatentLibrary" parameterType="GPatentLibrary" useGeneratedKeys="true" keyProperty="id">
-    insert into g_patent_library
-    <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="id != null and id != ''">id,</if>
-      <if test="patentNo != null and patentNo != ''">patent_no,</if>
-      <if test="patentName != null and patentName != ''">patent_name,</if>
-      <if test="patentTypeKey != null and patentTypeKey != ''">patent_type_key,</if>
-      <if test="patentTypeValue != null">patent_type_value,</if>
-      <if test="domain != null">domain,</if>
-      <if test="feeDate != null">fee_date,</if>
-      <if test="guidancePrice != null">guidance_price,</if>
-      <if test="highTechReportedKey != null">high_tech_reported_key,</if>
-      <if test="highTechReportedValue != null">high_tech_reported_value,</if>
-      <if test="resourceProvider != null and resourceProvider != ''">resource_provider,</if>
-      <if test="remark != null">remark,</if>
-      <if test="statusKey != null">status_key,</if>
-      <if test="statusValue != null">status_value,</if>
-      <if test="bookerKey != null">booker_key,</if>
-      <if test="bookerValue != null">booker_value,</if>
-      <if test="days != null">days,</if>
-      <if test="deadline != null">deadline,</if>
-      <if test="createTime != null">create_time,</if>
-      <if test="updateTime != null">update_time,</if>
-      <if test="createBy != null">create_by,</if>
-      <if test="updateBy != null">update_by,</if>
-    </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="id != null and id != ''">#{id},</if>
-      <if test="patentNo != null and patentNo != ''">#{patentNo},</if>
-      <if test="patentName != null and patentName != ''">#{patentName},</if>
-      <if test="patentTypeKey != null and patentTypeKey != ''">#{patentTypeKey},</if>
-      <if test="patentTypeValue != null">#{patentTypeValue},</if>
-      <if test="domain != null">#{domain},</if>
-      <if test="feeDate != null">#{feeDate},</if>
-      <if test="guidancePrice != null">#{guidancePrice},</if>
-      <if test="highTechReportedKey != null">#{highTechReportedKey},</if>
-      <if test="highTechReportedValue != null">#{highTechReportedValue},</if>
-      <if test="resourceProvider != null and resourceProvider != ''">#{resourceProvider},</if>
-      <if test="remark != null">#{remark},</if>
-      <if test="statusKey != null">#{statusKey},</if>
-      <if test="statusValue != null">#{statusValue},</if>
-      <if test="bookerKey != null">#{bookerKey},</if>
-      <if test="bookerValue != null">#{bookerValue},</if>
-      <if test="days != null">#{days},</if>
-      <if test="deadline != null">#{deadline},</if>
-      <if test="createTime != null">#{createTime},</if>
-      <if test="updateTime != null">#{updateTime},</if>
-      <if test="createBy != null">#{createBy},</if>
-      <if test="updateBy != null">#{updateBy},</if>
-    </trim>
-  </insert>
-
-  <update id="updateGPatentLibrary" parameterType="GPatentLibrary">
-    update g_patent_library
-    <trim prefix="SET" suffixOverrides=",">
-      <if test="patentNo != null and patentNo != ''">patent_no = #{patentNo},
-      </if>
-      <if test="patentName != null and patentName != ''">patent_name = #{patentName},
-      </if>
-      <if test="patentTypeKey != null and patentTypeKey != ''">patent_type_key = #{patentTypeKey},
-      </if>
-      <if test="patentTypeValue != null">patent_type_value = #{patentTypeValue},
-      </if>
-      <if test="domain != null">domain = #{domain},
-      </if>
-      <if test="feeDate != null">fee_date = #{feeDate},
-      </if>
-      <if test="guidancePrice != null">guidance_price = #{guidancePrice},
-      </if>
-      <if test="highTechReportedKey != null">high_tech_reported_key = #{highTechReportedKey},
-      </if>
-      <if test="highTechReportedValue != null">high_tech_reported_value = #{highTechReportedValue},
-      </if>
-      <if test="resourceProvider != null and resourceProvider != ''">resource_provider = #{resourceProvider},
-      </if>
-      <if test="remark != null">remark = #{remark},
-      </if>
-      <if test="statusKey != null">status_key = #{statusKey},
-      </if>
-      <if test="bookerTime != null">booker_time = #{bookerTime},
-      </if>
-      <if test="statusValue != null">status_value = #{statusValue},
-      </if>
-      <if test="bookerKey != null">booker_key = #{bookerKey},
-      </if>
-      <if test="bookerValue != null">booker_value = #{bookerValue},
-      </if>
-      <if test="days != null">days = #{days},
-      </if>
-      <if test="deadline != null">deadline = #{deadline},
-      </if>
-      <if test="createTime != null">create_time = #{createTime},
-      </if>
-      <if test="updateTime != null">update_time = #{updateTime},
-      </if>
-      <if test="createBy != null">create_by = #{createBy},
-      </if>
-      <if test="updateBy != null">update_by = #{updateBy},
-      </if>
-      <if test="soldUserId != null">sold_user_id = #{soldUserId},
-      </if>
-      <if test="soldTime != null">sold_time = #{soldTime},
-      </if>
-    </trim>
-    where id = #{id}
-  </update>
-
-  <delete id="deleteGPatentLibraryById" parameterType="Long">
-    delete
-    from g_patent_library
-    where id = #{id}
-  </delete>
-
-  <delete id="deleteGPatentLibraryByIds" parameterType="String">
-    delete from g_patent_library where id in
-    <foreach item="id" collection="array" open="(" separator="," close=")">
-      #{id}
-    </foreach>
-  </delete>
+    </delete>
 
 </mapper>

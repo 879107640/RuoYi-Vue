@@ -64,10 +64,7 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
    */
   @Override
   public List<GPatentLibrary> selectGPatentLibraryList(GPatentLibrary gPatentLibrary) {
-    if (StrUtil.isNotEmpty(gPatentLibrary.getCreateBy()) && Objects.nonNull(gPatentLibrary.getBookerKey())) {
-      gPatentLibrary.setBookerKey(null);
-      gPatentLibrary.setForMeBooker(1);
-    }
+
     List<GPatentLibrary> gPatentLibraries = gPatentLibraryMapper.selectGPatentLibraryList(gPatentLibrary);
     for (GPatentLibrary patentLibrary : gPatentLibraries) {
       GPatenLibraryLineUp gPatenLibraryLineUp = new GPatenLibraryLineUp();
@@ -118,6 +115,10 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
     GPatentLibrary old = gPatentLibraryMapper.selectGPatentLibraryById(gPatentLibrary.getId());
     if (Objects.nonNull(old) && !old.getPatentNo().equals(gPatentLibrary.getPatentNo())) {
       throw new ServiceException("专利号不允许修改");
+    }
+
+    if (old.getBookerKey() == 2) {
+      throw new ServiceException("已预订的专利不允许修改");
     }
     gPatentLibrary.setUpdateTime(DateUtils.getNowDate());
     return gPatentLibraryMapper.updateGPatentLibrary(gPatentLibrary);
@@ -326,7 +327,7 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
       throw new ServiceException("专利不存在");
     }
 
-    if (gPatentLibrary.getBookerTime().getTime() < new Date().getTime()) {
+    if (gPatentLibrary.getDeadline().getTime() < new Date().getTime()) {
 
       List<GPatenLibraryLineUp> oneByGPatentIdAndUserId = libraryLineUpMapper.getOneByGPatentIdAndUserId(id);
       if (Objects.isNull(oneByGPatentIdAndUserId)) {

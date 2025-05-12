@@ -66,7 +66,7 @@ public interface GPatentLibraryMapper  {
 
   GPatentLibrary selectGPatentLibraryByNo(@Param("patentNo") String patentNo);
 
-  @Delete("delete from g_patent_library where create_by = #{username} and status_key != 2")
+  @Delete("delete from g_patent_library where create_by = #{username} and status_key == 1")
   void allDelete(String username);
 
   @Update("update g_patent_library set status_key = 1, booker_key = null, booker_value = null, booker_time = null, deadline = null where id = #{id}")

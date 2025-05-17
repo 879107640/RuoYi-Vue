@@ -1,4 +1,4 @@
-package com.ruoyi.web.controller.system.pay.channel;
+package com.ruoyi.web.controller.system;
 
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
@@ -23,7 +23,7 @@ import static com.ruoyi.common.utils.collection.CollectionUtils.convertSet;
 
 @Tag(name = "管理后台 - 支付渠道")
 @RestController
-@RequestMapping("/pay/channel")
+@RequestMapping("/system/pay/channel")
 @Validated
 public class PayChannelController extends BaseController {
 

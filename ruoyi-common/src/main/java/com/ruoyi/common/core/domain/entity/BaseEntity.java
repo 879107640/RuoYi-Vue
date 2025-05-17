@@ -22,6 +22,7 @@ import java.util.Map;
 public class BaseEntity implements Serializable {
   private static final long serialVersionUID = 1L;
 
+  private Integer deleted;
 
   /**
    * 创建者

@@ -1,7 +1,6 @@
 package com.ruoyi.pay.convert.refund;
 
 import com.ruoyi.common.core.page.PageResult;
-import com.ruoyi.pay.config.core.client.dto.refund.PayRefundRespDTO;
 import com.ruoyi.pay.domain.app.PayAppDO;
 import com.ruoyi.pay.domain.order.PayOrderDO;
 import com.ruoyi.pay.domain.refund.PayRefundDO;
@@ -41,7 +40,5 @@ public interface PayRefundConvert {
   PageResult<PayRefundPageItemRespVO> convertPage(PageResult<PayRefundDO> page);
 
   PayRefundDO convert(PayRefundCreateReqDTO bean);
-
-  PayRefundRespDTO convert02(PayRefundDO bean);
 
 }

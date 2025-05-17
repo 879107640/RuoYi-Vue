@@ -4,8 +4,10 @@ package com.ruoyi.pay.service.wallet;
 import com.ruoyi.common.core.page.PageResult;
 import com.ruoyi.common.enums.wallet.PayWalletBizTypeEnum;
 import com.ruoyi.pay.domain.wallet.PayWalletDO;
+import com.ruoyi.pay.domain.wallet.PayWalletRechargeDO;
 import com.ruoyi.pay.domain.wallet.PayWalletTransactionDO;
 import com.ruoyi.pay.service.vo.wallet.PayWalletPageReqVO;
+import com.ruoyi.pay.service.vo.wallet.PayWalletRechargeCreateReqVO;
 
 /**
  * 钱包 Service 接口
@@ -97,5 +99,7 @@ public interface PayWalletService {
      * @param price 解冻金额
      */
     void unfreezePrice(Long id, Integer price);
+
+  PayWalletRechargeDO createWalletRecharge(Long userId, Integer memberType, String ipAddr, PayWalletRechargeCreateReqVO reqVO);
 
 }

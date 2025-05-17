@@ -43,7 +43,7 @@
     <dynamic-datasource.version>4.3.1</dynamic-datasource.version>
     <knife4j.version>4.6.0</knife4j.version>
     <springdoc.version>2.7.0</springdoc.version>
-    <redisson.version>3.41.0</redisson.version>
+    <redisson.version>3.18.0</redisson.version>
     <weixin-java.version>4.6.0</weixin-java.version>
   </properties>
 

@@ -20,7 +20,7 @@ public interface PayChannelConvert {
     @Mapping(target = "config",ignore = true)
     PayChannelDO convert(PayChannelUpdateReqVO bean);
 
-    @Mapping(target = "config",expression = "java(com.george.cloud.framework.common.util.json.JsonUtils.toJsonString(bean.getConfig()))")
+    @Mapping(target = "config",expression = "java(com.ruoyi.common.utils.json.JsonUtils.toJsonString(bean.getConfig()))")
     PayChannelRespVO convert(PayChannelDO bean);
 
 

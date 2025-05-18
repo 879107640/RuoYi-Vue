@@ -116,6 +116,21 @@ public class GPatentLibraryController extends BaseController {
   public AjaxResult importData(MultipartFile file, boolean updateSupport) throws Exception {
     ExcelUtil<GPatentLibrary> util = new ExcelUtil<>(GPatentLibrary.class);
     List<GPatentLibrary> gPatentLibraries = util.importExcel(file.getInputStream());
+
+    StringBuilder errorMsg = new StringBuilder();
+    int rowNum = 0;
+
+    for (GPatentLibrary patent : gPatentLibraries) {
+      rowNum++;
+      if (patent.getPatentTypeKey() == null || patent.getPatentTypeKey().trim().isEmpty()) {
+        errorMsg.append("第 ").append(rowNum).append(" 行：专利类型键(patentTypeKey)不能为空；");
+      }
+    }
+
+    if (errorMsg.length() > 0) {
+      return error(errorMsg.toString());
+    }
+
     String message = gPatentLibraryService.importGPatentLibrary(gPatentLibraries, updateSupport);
     return success(message);
   }

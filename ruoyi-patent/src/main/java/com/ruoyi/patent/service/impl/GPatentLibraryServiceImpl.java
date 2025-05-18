@@ -155,6 +155,7 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
   @Transactional(rollbackFor = Exception.class)
   public String importGPatentLibrary(List<GPatentLibrary> gPatentLibraries, boolean updateSupport) {
     for (GPatentLibrary gPatentLibrary : gPatentLibraries) {
+      gPatentLibrary.setCreateBy(String.valueOf(SecurityUtils.getUserId()));
       GPatentLibrary oldGPatentLibrary = gPatentLibraryMapper.selectGPatentLibraryByNo(gPatentLibrary.getPatentNo());
       if (Objects.nonNull(oldGPatentLibrary) && updateSupport) {
         gPatentLibrary.setId(oldGPatentLibrary.getId());

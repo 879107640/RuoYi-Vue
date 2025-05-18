@@ -9,6 +9,8 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.common.annotation.Excel;
 
+import javax.validation.constraints.NotNull;
+
 /**
  * 专利库数据对象 g_patent_library
  *
@@ -38,6 +40,7 @@ public class GPatentLibrary extends BaseEntity {
   /**
    * 专利类型
    */
+  @NotNull(message = "专利类型键不能为空")
   @Excel(name = "专利类型", readConverterExp = "1=授权未缴费发明,2=下证发明,3=授权未缴费实用,4=下证实用", sort = 1)
   private String patentTypeKey;
 
@@ -386,26 +389,26 @@ public class GPatentLibrary extends BaseEntity {
   @Override
   public String toString() {
     return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
-        .append("id", getId())
-        .append("patentNo", getPatentNo())
-        .append("patentName", getPatentName())
-        .append("patentTypeKey", getPatentTypeKey())
-        .append("patentTypeValue", getPatentTypeValue())
-        .append("domain", getDomain())
-        .append("feeDate", getFeeDate())
-        .append("guidancePrice", getGuidancePrice())
-        .append("highTechReportedKey", getHighTechReportedKey())
-        .append("highTechReportedValue", getHighTechReportedValue())
-        .append("resourceProvider", getResourceProvider())
-        .append("remark", getRemark())
-        .append("statusKey", getStatusKey())
-        .append("statusValue", getStatusValue())
-        .append("bookerKey", getBookerKey())
-        .append("bookerValue", getBookerValue())
-        .append("days", getDays())
-        .append("deadline", getDeadline())
-        .append("createTime", getCreateTime())
-        .append("updateTime", getUpdateTime())
-        .toString();
+            .append("id", getId())
+            .append("patentNo", getPatentNo())
+            .append("patentName", getPatentName())
+            .append("patentTypeKey", getPatentTypeKey())
+            .append("patentTypeValue", getPatentTypeValue())
+            .append("domain", getDomain())
+            .append("feeDate", getFeeDate())
+            .append("guidancePrice", getGuidancePrice())
+            .append("highTechReportedKey", getHighTechReportedKey())
+            .append("highTechReportedValue", getHighTechReportedValue())
+            .append("resourceProvider", getResourceProvider())
+            .append("remark", getRemark())
+            .append("statusKey", getStatusKey())
+            .append("statusValue", getStatusValue())
+            .append("bookerKey", getBookerKey())
+            .append("bookerValue", getBookerValue())
+            .append("days", getDays())
+            .append("deadline", getDeadline())
+            .append("createTime", getCreateTime())
+            .append("updateTime", getUpdateTime())
+            .toString();
   }
 }

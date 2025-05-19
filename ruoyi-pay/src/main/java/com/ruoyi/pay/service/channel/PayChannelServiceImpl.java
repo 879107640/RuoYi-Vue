@@ -1,7 +1,9 @@
 package com.ruoyi.pay.service.channel;
 
+import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.json.JSONUtil;
 import com.ruoyi.common.enums.CommonStatusEnum;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.json.JsonUtils;
@@ -92,7 +94,7 @@ public class PayChannelServiceImpl implements PayChannelService {
     if (ObjectUtil.isNull(payClass)) {
       throw new ServiceException("支付渠道的配置不存在");
     }
-    PayClientConfig config = JsonUtils.parseObject2(configStr, payClass);
+    PayClientConfig config = JSONUtil.toBean(configStr, payClass);
     Assert.notNull(config);
 
     // 验证参数

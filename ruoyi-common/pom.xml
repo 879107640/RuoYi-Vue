@@ -29,7 +29,7 @@
     <dependency>
       <groupId>cn.hutool</groupId>
       <artifactId>hutool-core</artifactId>
-      <version>5.8.3</version>
+      <version>5.8.35</version>
     </dependency>
     <!-- SpringWeb模块 -->
     <dependency>

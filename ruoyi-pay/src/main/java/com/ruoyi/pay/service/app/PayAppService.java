@@ -27,7 +27,7 @@ public interface PayAppService {
      * @param createReqVO 创建
      * @return 编号
      */
-    int createApp(@Valid PayAppCreateReqVO createReqVO);
+    Long createApp(@Valid PayAppCreateReqVO createReqVO);
 
     /**
      * 更新支付应用

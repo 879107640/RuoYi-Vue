@@ -3,6 +3,8 @@ package com.ruoyi.pay.domain.app;
 
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.ruoyi.common.core.domain.entity.BaseEntity;
 import com.ruoyi.common.enums.CommonStatusEnum;
 import lombok.*;
@@ -30,6 +32,7 @@ public class PayAppDO extends BaseEntity {
      * 应用编号，数据库自增
      */
     @TableId
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
     /**
      * 应用标识

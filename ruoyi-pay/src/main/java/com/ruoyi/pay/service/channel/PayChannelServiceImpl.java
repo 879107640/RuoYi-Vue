@@ -19,6 +19,7 @@ import com.ruoyi.pay.service.vo.PayChannelCreateReqVO;
 import com.ruoyi.pay.service.vo.PayChannelUpdateReqVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.PostConstruct;
@@ -56,7 +57,8 @@ public class PayChannelServiceImpl implements PayChannelService {
   }
 
   @Override
-  public int createChannel(PayChannelCreateReqVO reqVO) {
+  @Transactional(rollbackFor = Exception.class)
+  public Long createChannel(PayChannelCreateReqVO reqVO) {
     // 断言是否有重复的
     PayChannelDO dbChannel = getChannelByAppIdAndCode(reqVO.getAppId(), reqVO.getCode());
     if (dbChannel != null) {
@@ -67,10 +69,11 @@ public class PayChannelServiceImpl implements PayChannelService {
     PayChannelDO channel = PayChannelConvert.INSTANCE.convert(reqVO);
     channel.setConfig(parseConfig(reqVO.getCode(), reqVO.getConfig()));
     payChannelMapper.insert(channel);
-    return channel.getId().intValue();
+    return channel.getId();
   }
 
   @Override
+  @Transactional(rollbackFor = Exception.class)
   public void updateChannel(PayChannelUpdateReqVO updateReqVO) {
     // 校验存在
     PayChannelDO dbChannel = validateChannelExists(updateReqVO.getId());
@@ -105,6 +108,7 @@ public class PayChannelServiceImpl implements PayChannelService {
   }
 
   @Override
+  @Transactional(rollbackFor = Exception.class)
   public void deleteChannel(Long id) {
     // 校验存在
     validateChannelExists(id);

@@ -34,7 +34,7 @@ public class PayChannelController extends BaseController {
     @Operation(summary = "创建支付渠道 ")
     @PreAuthorize("@ss.hasPermi('pay:channel:create')")
     public AjaxResult createChannel(@Valid @RequestBody PayChannelCreateReqVO createReqVO) {
-        return toAjax(channelService.createChannel(createReqVO));
+        return success(channelService.createChannel(createReqVO));
     }
 
     @PutMapping("/update")

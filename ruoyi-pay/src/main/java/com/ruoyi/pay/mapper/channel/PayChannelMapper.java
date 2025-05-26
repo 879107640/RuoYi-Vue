@@ -2,7 +2,6 @@ package com.ruoyi.pay.mapper.channel;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.ruoyi.pay.domain.channel.PayChannelDO;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -17,10 +16,8 @@ public interface PayChannelMapper extends BaseMapper<PayChannelDO> {
   }
 
   default List<PayChannelDO> selectListByAppIds(Collection<Long> appIds) {
-    return selectList(
-            new LambdaQueryWrapper<PayChannelDO>()
-                    .in(CollectionUtils.isNotEmpty(appIds), PayChannelDO::getAppId, appIds)
-    );
+    return selectList(new LambdaQueryWrapper<PayChannelDO>()
+        .in(PayChannelDO::getAppId, appIds));
   }
 
   default List<PayChannelDO> selectListByAppId(Long appId, Integer status) {

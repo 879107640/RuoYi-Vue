@@ -1,4 +1,4 @@
-package com.ruoyi.web.controller.patent.order;
+package com.ruoyi.web.controller.patent.pay.order;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.google.common.collect.Maps;
@@ -16,14 +16,12 @@ import com.ruoyi.pay.domain.order.PayOrderExtensionDO;
 import com.ruoyi.pay.framework.pay.core.WalletPayClient;
 import com.ruoyi.pay.service.app.PayAppService;
 import com.ruoyi.pay.service.order.PayOrderService;
-import com.ruoyi.pay.service.vo.order.PayOrderPageReqVO;
-import com.ruoyi.pay.service.vo.order.PayOrderRespVO;
-import com.ruoyi.pay.service.vo.order.PayOrderSubmitReqVO;
-import com.ruoyi.pay.service.vo.order.PayOrderSubmitRespVO;
+import com.ruoyi.pay.service.vo.order.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.aspectj.weaver.loadtime.Aj;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -113,5 +111,9 @@ public class PayOrderController extends BaseController {
     return success(PayOrderConvert.INSTANCE.convertPage(pageResult, appMap));
   }
 
-
+  @PostMapping("/create")
+  @Operation(summary = "创建订单")
+  public AjaxResult createDemoOrder(@Valid @RequestBody PayOrderCreateReqVO createReqVO) {
+    return success(orderService.createOrder(getUserId(), createReqVO));
+  }
 }

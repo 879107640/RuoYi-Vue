@@ -287,7 +287,7 @@ public class PayWalletServiceImpl implements PayWalletService {
     payOrderCreateReqDTO.setBody("");
     payOrderCreateReqDTO.setPrice(recharge.getPayPrice());
     payOrderCreateReqDTO.setExpireTime(addTime(Duration.ofHours(2L)));
-    Long payOrderId = payOrderService.createOrder(payOrderCreateReqDTO); // TODO @Centre：支付超时时间
+    Long payOrderId = payOrderService.createPayOrder(payOrderCreateReqDTO); // TODO @Centre：支付超时时间
     // 2.2 更新钱包充值记录中支付订单
     PayWalletRechargeDO payWalletRechargeDO = new PayWalletRechargeDO();
     payWalletRechargeDO.setId(recharge.getId());

@@ -1,4 +1,4 @@
-package com.ruoyi.web.controller.patent.wallet;
+package com.ruoyi.web.controller.patent.pay.wallet;
 
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;

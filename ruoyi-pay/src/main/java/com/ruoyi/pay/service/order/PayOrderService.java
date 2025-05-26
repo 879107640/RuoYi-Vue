@@ -6,10 +6,7 @@ import com.ruoyi.pay.config.core.client.dto.order.PayOrderRespDTO;
 import com.ruoyi.pay.domain.order.PayOrderDO;
 import com.ruoyi.pay.domain.order.PayOrderExtensionDO;
 import com.ruoyi.pay.service.dto.PayOrderCreateReqDTO;
-import com.ruoyi.pay.service.vo.order.PayOrderExportReqVO;
-import com.ruoyi.pay.service.vo.order.PayOrderPageReqVO;
-import com.ruoyi.pay.service.vo.order.PayOrderSubmitReqVO;
-import com.ruoyi.pay.service.vo.order.PayOrderSubmitRespVO;
+import com.ruoyi.pay.service.vo.order.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
@@ -79,7 +76,16 @@ public interface PayOrderService {
      * @param reqDTO 创建请求
      * @return 支付单编号
      */
-    Long createOrder(@Valid PayOrderCreateReqDTO reqDTO);
+    Long createPayOrder(@Valid PayOrderCreateReqDTO reqDTO);
+
+    /**
+     * 创建示例订单
+     *
+     * @param userId      用户编号
+     * @param createReqVO 创建信息
+     * @return 编号
+     */
+    Long createOrder(Long userId, @Valid PayOrderCreateReqVO createReqVO);
 
     /**
      * 提交支付

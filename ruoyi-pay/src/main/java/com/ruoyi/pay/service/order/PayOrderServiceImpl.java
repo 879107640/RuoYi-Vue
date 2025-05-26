@@ -11,6 +11,7 @@ import com.ruoyi.common.enums.order.PayOrderStatusEnum;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.date.LocalDateTimeUtils;
+import com.ruoyi.common.utils.ip.IpUtils;
 import com.ruoyi.pay.config.core.client.PayClient;
 import com.ruoyi.pay.config.core.client.dto.order.PayOrderRespDTO;
 import com.ruoyi.pay.config.core.client.dto.order.PayOrderUnifiedReqDTO;
@@ -20,18 +21,17 @@ import com.ruoyi.pay.domain.app.PayAppDO;
 import com.ruoyi.pay.domain.channel.PayChannelDO;
 import com.ruoyi.pay.domain.order.PayOrderDO;
 import com.ruoyi.pay.domain.order.PayOrderExtensionDO;
+import com.ruoyi.pay.domain.order.PayPatentOrderDO;
 import com.ruoyi.pay.framework.pay.config.PayProperties;
 import com.ruoyi.pay.mapper.order.PayOrderExtensionMapper;
 import com.ruoyi.pay.mapper.order.PayOrderMapper;
+import com.ruoyi.pay.mapper.order.PayPatentOrderMapper;
 import com.ruoyi.pay.redis.no.PayNoRedisDAO;
 import com.ruoyi.pay.service.app.PayAppService;
 import com.ruoyi.pay.service.channel.PayChannelService;
 import com.ruoyi.pay.service.dto.PayOrderCreateReqDTO;
 import com.ruoyi.pay.service.notify.PayNotifyService;
-import com.ruoyi.pay.service.vo.order.PayOrderExportReqVO;
-import com.ruoyi.pay.service.vo.order.PayOrderPageReqVO;
-import com.ruoyi.pay.service.vo.order.PayOrderSubmitReqVO;
-import com.ruoyi.pay.service.vo.order.PayOrderSubmitRespVO;
+import com.ruoyi.pay.service.vo.order.*;
 import com.ruoyi.pay.util.number.MoneyUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -39,12 +39,15 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+import static com.ruoyi.common.utils.date.LocalDateTimeUtils.addTime;
 import static com.ruoyi.pay.util.json.JsonUtils.toJsonString;
 
 /**
@@ -73,6 +76,8 @@ public class PayOrderServiceImpl implements PayOrderService {
   private PayChannelService channelService;
   @Resource
   private PayNotifyService notifyService;
+  @Resource
+  PayPatentOrderMapper patentOrderMapper;
 
   @Override
   public PayOrderDO getOrder(Long id) {
@@ -109,7 +114,7 @@ public class PayOrderServiceImpl implements PayOrderService {
   }
 
   @Override
-  public Long createOrder(PayOrderCreateReqDTO reqDTO) {
+  public Long createPayOrder(PayOrderCreateReqDTO reqDTO) {
     // 校验 App
     PayAppDO app = appService.validPayApp(reqDTO.getAppKey());
 
@@ -133,6 +138,34 @@ public class PayOrderServiceImpl implements PayOrderService {
     order.setRefundPrice(0);
     orderMapper.insert(order);
     return order.getId();
+  }
+
+  @Override
+  public Long createOrder(Long userId, PayOrderCreateReqVO createReqVO) {
+    // 1.2 插入 demo 订单
+    PayPatentOrderDO patentOrderDO = new PayPatentOrderDO();
+    patentOrderDO.setUserId(userId);
+    patentOrderDO.setPatentNo(createReqVO.getPatentNo());
+    patentOrderDO.setPrice(1);
+    patentOrderDO.setPayStatus(false);
+    patentOrderDO.setRefundPrice(0);
+    patentOrderMapper.insert(patentOrderDO);
+
+    // 2.1 创建支付单
+    PayOrderCreateReqDTO payOrderCreateReqDTO = new PayOrderCreateReqDTO();
+    payOrderCreateReqDTO.setAppKey("patent");
+    payOrderCreateReqDTO.setUserIp(IpUtils.getHostIp()) ;// 支付应用
+    payOrderCreateReqDTO.setMerchantOrderId(patentOrderDO.getId().toString()) ;// 业务的订单编号
+    payOrderCreateReqDTO.setSubject(createReqVO.getPatentNo());
+    payOrderCreateReqDTO.setBody("");
+    payOrderCreateReqDTO.setPrice(patentOrderDO.getPrice()); // 价格信息
+    payOrderCreateReqDTO.setExpireTime(addTime(Duration.ofHours(2L)));
+    Long payOrderId = createPayOrder(payOrderCreateReqDTO); // 支付的过期时间
+    // 2.2 更新支付单到 demo 订单
+    patentOrderDO.setPayOrderId(payOrderId);
+    patentOrderMapper.updateById(patentOrderDO);
+    // 返回
+    return patentOrderDO.getId();
   }
 
   @Override // 注意，这里不能添加事务注解，避免调用支付渠道失败时，将 PayOrderExtensionDO 回滚了

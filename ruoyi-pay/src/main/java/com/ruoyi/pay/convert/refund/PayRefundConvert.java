@@ -5,6 +5,7 @@ import com.ruoyi.pay.domain.app.PayAppDO;
 import com.ruoyi.pay.domain.order.PayOrderDO;
 import com.ruoyi.pay.domain.refund.PayRefundDO;
 import com.ruoyi.pay.service.dto.refund.PayRefundCreateReqDTO;
+import com.ruoyi.pay.service.dto.refund.PayRefundRespDTO;
 import com.ruoyi.pay.service.vo.refund.PayRefundDetailsRespVO;
 import com.ruoyi.pay.service.vo.refund.PayRefundPageItemRespVO;
 import com.ruoyi.pay.util.MapUtils;
@@ -40,5 +41,7 @@ public interface PayRefundConvert {
   PageResult<PayRefundPageItemRespVO> convertPage(PageResult<PayRefundDO> page);
 
   PayRefundDO convert(PayRefundCreateReqDTO bean);
+
+  PayRefundRespDTO convert02(PayRefundDO bean);
 
 }

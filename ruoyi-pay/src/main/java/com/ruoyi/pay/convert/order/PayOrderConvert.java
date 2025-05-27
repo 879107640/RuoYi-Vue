@@ -29,6 +29,8 @@ public interface PayOrderConvert {
 
     PayOrderRespDTO convert2(PayOrderDO order);
 
+    com.ruoyi.pay.service.dto.PayOrderRespDTO convert3(PayOrderDO order);
+
     default PayOrderDetailsRespVO convert(PayOrderDO order, PayOrderExtensionDO orderExtension, PayAppDO app) {
         PayOrderDetailsRespVO respVO = convertDetail(order);
         respVO.setExtension(convert(orderExtension));

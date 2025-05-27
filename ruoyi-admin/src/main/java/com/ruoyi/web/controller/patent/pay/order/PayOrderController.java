@@ -15,18 +15,19 @@ import com.ruoyi.pay.domain.order.PayOrderDO;
 import com.ruoyi.pay.domain.order.PayOrderExtensionDO;
 import com.ruoyi.pay.framework.pay.core.WalletPayClient;
 import com.ruoyi.pay.service.app.PayAppService;
+import com.ruoyi.pay.service.dto.notify.dto.PayOrderNotifyReqDTO;
 import com.ruoyi.pay.service.order.PayOrderService;
 import com.ruoyi.pay.service.vo.order.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.aspectj.weaver.loadtime.Aj;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.annotation.security.PermitAll;
 import javax.validation.Valid;
 import java.util.Map;
 import java.util.Objects;
@@ -115,5 +116,15 @@ public class PayOrderController extends BaseController {
   @Operation(summary = "创建订单")
   public AjaxResult createDemoOrder(@Valid @RequestBody PayOrderCreateReqVO createReqVO) {
     return success(orderService.createOrder(getUserId(), createReqVO));
+  }
+
+
+  @PostMapping("/update-paid")
+  @Operation(summary = "更新示例订单为已支付") // 由 pay-module 支付服务，进行回调，可见 PayNotifyJob
+  @PermitAll // 无需登录，安全由 PayDemoOrderService 内部校验实现
+  public AjaxResult updateOrderPaid(@RequestBody PayOrderNotifyReqDTO notifyReqDTO) {
+    orderService.updateOrderPaid(Long.valueOf(notifyReqDTO.getMerchantOrderId()),
+        notifyReqDTO.getPayOrderId());
+    return success(true);
   }
 }

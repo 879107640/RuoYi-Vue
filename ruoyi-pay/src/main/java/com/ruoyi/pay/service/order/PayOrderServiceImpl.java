@@ -8,7 +8,9 @@ import com.google.common.annotations.VisibleForTesting;
 import com.ruoyi.common.core.page.PageResult;
 import com.ruoyi.common.enums.notify.PayNotifyTypeEnum;
 import com.ruoyi.common.enums.order.PayOrderStatusEnum;
+import com.ruoyi.common.enums.refund.PayRefundStatusEnum;
 import com.ruoyi.common.exception.ServiceException;
+import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.date.LocalDateTimeUtils;
 import com.ruoyi.common.utils.ip.IpUtils;
@@ -17,11 +19,13 @@ import com.ruoyi.pay.config.core.client.dto.order.PayOrderRespDTO;
 import com.ruoyi.pay.config.core.client.dto.order.PayOrderUnifiedReqDTO;
 import com.ruoyi.pay.config.core.enums.order.PayOrderStatusRespEnum;
 import com.ruoyi.pay.convert.order.PayOrderConvert;
+import com.ruoyi.pay.convert.refund.PayRefundConvert;
 import com.ruoyi.pay.domain.app.PayAppDO;
 import com.ruoyi.pay.domain.channel.PayChannelDO;
 import com.ruoyi.pay.domain.order.PayOrderDO;
 import com.ruoyi.pay.domain.order.PayOrderExtensionDO;
 import com.ruoyi.pay.domain.order.PayPatentOrderDO;
+import com.ruoyi.pay.domain.refund.PayRefundDO;
 import com.ruoyi.pay.framework.pay.config.PayProperties;
 import com.ruoyi.pay.mapper.order.PayOrderExtensionMapper;
 import com.ruoyi.pay.mapper.order.PayOrderMapper;
@@ -30,7 +34,10 @@ import com.ruoyi.pay.redis.no.PayNoRedisDAO;
 import com.ruoyi.pay.service.app.PayAppService;
 import com.ruoyi.pay.service.channel.PayChannelService;
 import com.ruoyi.pay.service.dto.PayOrderCreateReqDTO;
+import com.ruoyi.pay.service.dto.refund.PayRefundCreateReqDTO;
+import com.ruoyi.pay.service.dto.refund.PayRefundRespDTO;
 import com.ruoyi.pay.service.notify.PayNotifyService;
+import com.ruoyi.pay.service.refund.PayRefundService;
 import com.ruoyi.pay.service.vo.order.*;
 import com.ruoyi.pay.util.number.MoneyUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +46,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.math.BigDecimal;
+import javax.validation.constraints.NotNull;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -47,6 +54,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+import static cn.hutool.core.util.ObjectUtil.notEqual;
 import static com.ruoyi.common.utils.date.LocalDateTimeUtils.addTime;
 import static com.ruoyi.pay.util.json.JsonUtils.toJsonString;
 
@@ -60,6 +68,7 @@ import static com.ruoyi.pay.util.json.JsonUtils.toJsonString;
 @Slf4j
 public class PayOrderServiceImpl implements PayOrderService {
 
+  private static final @NotNull(message = "应用标识不能为空") String PAY_APP_KEY = "patent";
   @Resource
   private PayProperties payProperties;
 
@@ -78,6 +87,8 @@ public class PayOrderServiceImpl implements PayOrderService {
   private PayNotifyService notifyService;
   @Resource
   PayPatentOrderMapper patentOrderMapper;
+  @Resource
+  private PayRefundService payRefundService;
 
   @Override
   public PayOrderDO getOrder(Long id) {
@@ -141,7 +152,7 @@ public class PayOrderServiceImpl implements PayOrderService {
   }
 
   @Override
-  public Long createOrder(Long userId, PayOrderCreateReqVO createReqVO) {
+  public String createOrder(Long userId, PayOrderCreateReqVO createReqVO) {
     // 1.2 插入 demo 订单
     PayPatentOrderDO patentOrderDO = new PayPatentOrderDO();
     patentOrderDO.setUserId(userId);
@@ -154,10 +165,10 @@ public class PayOrderServiceImpl implements PayOrderService {
     // 2.1 创建支付单
     PayOrderCreateReqDTO payOrderCreateReqDTO = new PayOrderCreateReqDTO();
     payOrderCreateReqDTO.setAppKey("patent");
-    payOrderCreateReqDTO.setUserIp(IpUtils.getHostIp()) ;// 支付应用
-    payOrderCreateReqDTO.setMerchantOrderId(patentOrderDO.getId().toString()) ;// 业务的订单编号
-    payOrderCreateReqDTO.setSubject(createReqVO.getPatentNo());
-    payOrderCreateReqDTO.setBody("");
+    payOrderCreateReqDTO.setUserIp(IpUtils.getHostIp());// 支付应用
+    payOrderCreateReqDTO.setMerchantOrderId(patentOrderDO.getId().toString());// 业务的订单编号
+    payOrderCreateReqDTO.setSubject("");
+    payOrderCreateReqDTO.setBody(createReqVO.getPatentNo());
     payOrderCreateReqDTO.setPrice(patentOrderDO.getPrice()); // 价格信息
     payOrderCreateReqDTO.setExpireTime(addTime(Duration.ofHours(2L)));
     Long payOrderId = createPayOrder(payOrderCreateReqDTO); // 支付的过期时间
@@ -165,7 +176,7 @@ public class PayOrderServiceImpl implements PayOrderService {
     patentOrderDO.setPayOrderId(payOrderId);
     patentOrderMapper.updateById(patentOrderDO);
     // 返回
-    return patentOrderDO.getId();
+    return payOrderId.toString();
   }
 
   @Override // 注意，这里不能添加事务注解，避免调用支付渠道失败时，将 PayOrderExtensionDO 回滚了
@@ -190,7 +201,7 @@ public class PayOrderServiceImpl implements PayOrderService {
     PayOrderUnifiedReqDTO unifiedOrderReqDTO = PayOrderConvert.INSTANCE.convert2(reqVO, userIp);
     // 商户相关的字段
     unifiedOrderReqDTO.setOutTradeNo(orderExtension.getNo()); // 注意，此处使用的是 PayOrderExtensionDO.no 属性！
-    unifiedOrderReqDTO.setSubject(order.getSubject());
+    unifiedOrderReqDTO.setSubject("查看专利信息：" + SecurityUtils.getUsername());
     unifiedOrderReqDTO.setBody(order.getBody());
     unifiedOrderReqDTO.setNotifyUrl(genChannelOrderNotifyUrl(channel));
     unifiedOrderReqDTO.setReturnUrl(reqVO.getReturnUrl());
@@ -567,6 +578,171 @@ public class PayOrderServiceImpl implements PayOrderService {
       count += expireOrder(order) ? 1 : 0;
     }
     return count;
+  }
+
+  @Override
+  public void updateOrderPaid(Long id, Long payOrderId) {
+    // 1.1 校验订单是否存在
+    PayPatentOrderDO order = patentOrderMapper.selectById(id);
+    if (order == null) {
+      log.error("[updateDemoOrderPaid][order({}) payOrder({}) 不存在订单，请进行处理！]", id, payOrderId);
+      throw new ServiceException("订单不存在");
+    }
+    // 1.2 校验订单已支付
+    if (order.getPayStatus()) {
+      // 特殊：如果订单已支付，且支付单号相同，直接返回，说明重复回调
+      if (ObjectUtil.equals(order.getPayOrderId(), payOrderId)) {
+        log.warn("[updateDemoOrderPaid][order({}) 已支付，且支付单号相同({})，直接返回]", order, payOrderId);
+        return;
+      }
+      // 异常：支付单号不同，说明支付单号错误
+      log.error("[updateDemoOrderPaid][order({}) 支付单不匹配({})，请进行处理！order 数据是：{}]",
+          order, payOrderId, toJsonString(order));
+      throw new ServiceException("订单更新支付状态失败，支付单编号不匹配");
+    }
+
+    // 2. 校验支付订单的合法性
+    com.ruoyi.pay.service.dto.PayOrderRespDTO payOrder = validatePayOrderPaid(order, payOrderId);
+
+    // 3. 更新 PayPatentOrderDO 状态为已支付
+    PayPatentOrderDO payPatentOrderDO = new PayPatentOrderDO();
+    payPatentOrderDO.setPayStatus(true);
+    payPatentOrderDO.setPayTime(LocalDateTime.now());
+    payPatentOrderDO.setPayChannelCode(payOrder.getChannelCode());
+    int updateCount = patentOrderMapper.updateByIdAndPayed(id, false, payPatentOrderDO);
+    if (updateCount == 0) {
+      throw new ServiceException("订单更新支付状态失败，订单不是【未支付】状态");
+    }
+  }
+
+  @Override
+  public void refundOrder(Long id, String userIp) {
+    // 1. 校验订单是否可以退款
+    PayPatentOrderDO order = validateDemoOrderCanRefund(id);
+
+    PayRefundCreateReqDTO payRefundCreateReqDTO = getPayRefundCreateReqDTO(order);
+    Long payRefundId = payRefundService.createPayRefund(payRefundCreateReqDTO);// 价格信息
+    // 2.3 更新退款单到 demo 订单
+    PayPatentOrderDO payPatentOrderDO = new PayPatentOrderDO();
+    payPatentOrderDO.setId(id);
+    payPatentOrderDO.setPayRefundId(payRefundId);
+    payPatentOrderDO.setRefundPrice(order.getPrice());
+    patentOrderMapper.updateById(new PayPatentOrderDO());
+  }
+
+  private static PayRefundCreateReqDTO getPayRefundCreateReqDTO(PayPatentOrderDO order) {
+    String refundId = order.getId() + "-refund";
+    // 2.2 创建退款单
+    PayRefundCreateReqDTO payRefundCreateReqDTO = new PayRefundCreateReqDTO();
+    payRefundCreateReqDTO
+        .setAppKey(PAY_APP_KEY);
+    payRefundCreateReqDTO.setUserIp(IpUtils.getIpAddr()); // 支付应用
+    payRefundCreateReqDTO.setMerchantOrderId(String.valueOf(order.getId()));// 支付单号
+    payRefundCreateReqDTO.setMerchantRefundId(refundId);
+    payRefundCreateReqDTO.setReason("想退钱");
+    payRefundCreateReqDTO.setPrice(order.getPrice());
+    return payRefundCreateReqDTO;
+  }
+
+  @Override
+  public void updateOrderRefunded(Long id, Long payRefundId) {
+// 1. 校验并获得退款订单（可退款）
+    PayRefundRespDTO payRefund = validateOrderCanRefunded(id, payRefundId);
+    // 2.2 更新退款单到 demo 订单
+    PayPatentOrderDO payPatentOrderDO = new PayPatentOrderDO();
+    payPatentOrderDO.setId(id);
+    payPatentOrderDO.setRefundTime(payRefund.getSuccessTime());
+    patentOrderMapper.updateById(payPatentOrderDO);
+  }
+
+
+  private PayRefundRespDTO validateOrderCanRefunded(Long id, Long payRefundId) {
+    // 1.1 校验示例订单
+    PayPatentOrderDO order = patentOrderMapper.selectById(id);
+    if (order == null) {
+      throw new ServiceException("订单不存在");
+    }
+    // 1.2 校验退款订单匹配
+    if (Objects.equals(order.getPayRefundId(), payRefundId)) {
+      log.error("[validateDemoOrderCanRefunded][order({}) 退款单不匹配({})，请进行处理！order 数据是：{}]",
+          id, payRefundId, toJsonString(order));
+      throw new ServiceException("发起退款失败，退款单编号不匹配");
+    }
+
+    // 2.1 校验退款订单
+    PayRefundDO payRefund = payRefundService.getRefund(payRefundId);
+    if (payRefund == null) {
+      throw new ServiceException("发起退款失败，退款订单不存在");
+    }
+    // 2.2
+    if (!PayRefundStatusEnum.isSuccess(payRefund.getStatus())) {
+      throw new ServiceException("发起退款失败，退款订单未退款成功");
+    }
+    // 2.3 校验退款金额一致
+    if (notEqual(payRefund.getRefundPrice(), order.getPrice())) {
+      log.error("[validateDemoOrderCanRefunded][order({}) payRefund({}) 退款金额不匹配，请进行处理！order 数据是：{}，payRefund 数据是：{}]",
+          id, payRefundId, toJsonString(order), toJsonString(payRefund));
+      throw new ServiceException("发起退款失败，退款单金额不匹配");
+    }
+    // 2.4 校验退款订单匹配（二次）
+    if (notEqual(payRefund.getMerchantOrderId(), id.toString())) {
+      log.error("[validateDemoOrderCanRefunded][order({}) 退款单不匹配({})，请进行处理！payRefund 数据是：{}]",
+          id, payRefundId, toJsonString(payRefund));
+      throw new ServiceException("发起退款失败，退款单编号不匹配");
+    }
+    return PayRefundConvert.INSTANCE.convert02(payRefundService.getRefund(id));
+  }
+
+  private PayPatentOrderDO validateDemoOrderCanRefund(Long id) {
+    // 校验订单是否存在
+    PayPatentOrderDO order = patentOrderMapper.selectById(id);
+    if (order == null) {
+      throw new ServiceException("订单不存在");
+    }
+    // 校验订单是否支付
+    if (!order.getPayStatus()) {
+      throw new ServiceException("发起退款失败，订单未支付");
+    }
+    // 校验订单是否已退款
+    if (order.getPayRefundId() != null) {
+      throw new ServiceException("发起退款失败，订单已退款");
+    }
+    return order;
+  }
+
+  /**
+   * 校验支付订单的合法性
+   *
+   * @param order      交易订单
+   * @param payOrderId 支付订单编号
+   * @return 支付订单
+   */
+  private com.ruoyi.pay.service.dto.PayOrderRespDTO validatePayOrderPaid(PayPatentOrderDO order, Long payOrderId) {
+    // 1. 校验支付单是否存在
+    PayOrderDO payOrder = getOrder(payOrderId);
+    if (payOrder == null) {
+      log.error("[validatePayOrderPaid][order({}) payOrder({}) 不存在，请进行处理！]", order.getId(), payOrderId);
+      throw new ServiceException("支付订单不存在");
+    }
+    // 2.1 校验支付单已支付
+    if (!PayOrderStatusEnum.isSuccess(payOrder.getStatus())) {
+      log.error("[validatePayOrderPaid][order({}) payOrder({}) 未支付，请进行处理！payOrder 数据是：{}]",
+          order.getId(), payOrderId, toJsonString(payOrder));
+      throw new ServiceException("订单更新支付状态失败，支付单状态不是【支付成功】状态");
+    }
+    // 2.1 校验支付金额一致
+    if (notEqual(payOrder.getPrice(), order.getPrice())) {
+      log.error("[validatePayOrderPaid][order({}) payOrder({}) 支付金额不匹配，请进行处理！order 数据是：{}，payOrder 数据是：{}]",
+          order.getId(), payOrderId, toJsonString(order), toJsonString(payOrder));
+      throw new ServiceException("订单更新支付状态失败，支付单金额不匹配");
+    }
+    // 2.2 校验支付订单匹配（二次）
+    if (notEqual(payOrder.getMerchantOrderId(), order.getId().toString())) {
+      log.error("[validatePayOrderPaid][order({}) 支付单不匹配({})，请进行处理！payOrder 数据是：{}]",
+          order.getId(), payOrderId, toJsonString(payOrder));
+      throw new ServiceException("订单更新支付状态失败，支付单编号不匹配");
+    }
+    return PayOrderConvert.INSTANCE.convert3(payOrder);
   }
 
   /**

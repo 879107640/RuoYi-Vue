@@ -3,12 +3,12 @@ package com.ruoyi.pay.service.notify;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.db.PageResult;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 import com.google.common.annotations.VisibleForTesting;
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.core.page.PageResult;
 import com.ruoyi.common.enums.notify.PayNotifyStatusEnum;
 import com.ruoyi.common.enums.notify.PayNotifyTypeEnum;
 import com.ruoyi.common.utils.date.DateUtils;
@@ -281,6 +281,11 @@ public class PayNotifyServiceImpl implements PayNotifyService {
   @Override
   public List<PayNotifyLogDO> getNotifyLogList(Long taskId) {
     return notifyLogMapper.selectListByTaskId(taskId);
+  }
+
+  @Override
+  public PageResult<PayNotifyTaskDO> getNotifyTaskPage(PayNotifyTaskPageReqVO pageReqVO) {
+    return notifyTaskMapper.selectPage(pageReqVO);
   }
 
   /**

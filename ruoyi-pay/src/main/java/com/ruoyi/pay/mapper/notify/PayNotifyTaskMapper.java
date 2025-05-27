@@ -1,9 +1,12 @@
 package com.ruoyi.pay.mapper.notify;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.ruoyi.common.core.page.PageResult;
 import com.ruoyi.common.enums.notify.PayNotifyStatusEnum;
 import com.ruoyi.framework.mybatis.mapper.BaseMapperX;
+import com.ruoyi.framework.mybatis.query.LambdaQueryWrapperX;
 import com.ruoyi.pay.domain.notify.PayNotifyTaskDO;
+import com.ruoyi.pay.service.vo.notify.PayNotifyTaskPageReqVO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.time.LocalDateTime;
@@ -25,6 +28,17 @@ public interface PayNotifyTaskMapper extends BaseMapperX<PayNotifyTaskDO> {
         .in(PayNotifyTaskDO::getStatus, PayNotifyStatusEnum.WAITING.getStatus(),
             PayNotifyStatusEnum.REQUEST_SUCCESS.getStatus(), PayNotifyStatusEnum.REQUEST_FAILURE.getStatus())
         .le(PayNotifyTaskDO::getNextNotifyTime, LocalDateTime.now()));
+  }
+
+  default PageResult<PayNotifyTaskDO> selectPage(PayNotifyTaskPageReqVO reqVO) {
+    return selectPage(reqVO, new LambdaQueryWrapperX<PayNotifyTaskDO>()
+        .eqIfPresent(PayNotifyTaskDO::getAppId, reqVO.getAppId())
+        .eqIfPresent(PayNotifyTaskDO::getType, reqVO.getType())
+        .eqIfPresent(PayNotifyTaskDO::getDataId, reqVO.getDataId())
+        .eqIfPresent(PayNotifyTaskDO::getStatus, reqVO.getStatus())
+        .eqIfPresent(PayNotifyTaskDO::getMerchantOrderId, reqVO.getMerchantOrderId())
+        .betweenIfPresent(PayNotifyTaskDO::getCreateTime, reqVO.getCreateTime())
+        .orderByDesc(PayNotifyTaskDO::getId));
   }
 
 

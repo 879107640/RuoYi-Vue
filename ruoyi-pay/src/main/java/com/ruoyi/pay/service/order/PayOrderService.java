@@ -171,20 +171,4 @@ public interface PayOrderService {
    */
   void updateOrderPaid(Long id, Long payOrderId);
 
-  /**
-   * 发起订单的退款
-   *
-   * @param id 编号
-   * @param userIp 用户编号
-   */
-  void refundOrder(Long id, String userIp);
-
-  /**
-   * 更新订单为已退款
-   *
-   * @param id 编号
-   * @param payRefundId 退款订单号
-   */
-  void updateOrderRefunded(Long id, Long payRefundId);
-
 }

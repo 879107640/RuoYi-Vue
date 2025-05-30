@@ -1,7 +1,11 @@
 package com.ruoyi.pay.service.order;
 
 
+import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.page.PageResult;
+import com.ruoyi.common.exception.ServiceException;
+import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.patent.domain.GPatentLibrary;
 import com.ruoyi.pay.config.core.client.dto.order.PayOrderRespDTO;
 import com.ruoyi.pay.domain.order.PayOrderDO;
 import com.ruoyi.pay.domain.order.PayOrderExtensionDO;
@@ -13,6 +17,7 @@ import javax.validation.constraints.NotEmpty;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 支付订单 Service 接口
@@ -170,5 +175,7 @@ public interface PayOrderService {
    * @param payOrderId 支付订单号
    */
   void updateOrderPaid(Long id, Long payOrderId);
+
+  SysUser getPatentInfo(String id) ;
 
 }

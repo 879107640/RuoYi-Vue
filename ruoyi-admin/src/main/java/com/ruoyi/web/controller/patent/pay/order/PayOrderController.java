@@ -8,6 +8,7 @@ import com.ruoyi.common.core.page.PageResult;
 import com.ruoyi.common.enums.order.PayOrderStatusEnum;
 import com.ruoyi.common.utils.ip.IpUtils;
 import com.ruoyi.common.utils.object.BeanUtils;
+import com.ruoyi.patent.service.IGPatentLibraryService;
 import com.ruoyi.pay.config.core.enums.channel.PayChannelEnum;
 import com.ruoyi.pay.convert.order.PayOrderConvert;
 import com.ruoyi.pay.domain.app.PayAppDO;
@@ -127,4 +128,10 @@ public class PayOrderController extends BaseController {
         notifyReqDTO.getPayOrderId());
     return success(true);
   }
+
+  @GetMapping("/get-patent/{id}")
+  public AjaxResult getPatentInfo(@PathVariable("id") String id) {
+    return success(orderService.getPatentInfo(id));
+  }
+
 }

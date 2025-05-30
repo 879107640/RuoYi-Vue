@@ -48,6 +48,7 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
   @Resource
   SnowFlakeIdConfig snowFlakeIdConfig;
 
+
   /**
    * 查询专利库数据
    *
@@ -56,6 +57,7 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
    */
   @Override
   public GPatentLibrary selectGPatentLibraryById(String id) {
+
     return gPatentLibraryMapper.selectGPatentLibraryById(id);
   }
 
@@ -355,10 +357,5 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
     gPatentLibrary.setStatusKey("3");
     gPatentLibrary.setSoldTime(new Date());
     gPatentLibraryMapper.updateGPatentLibrary(gPatentLibrary);
-  }
-
-
-  public static void main(String[] args) {
-    System.err.println(new Date().getTime());
   }
 }

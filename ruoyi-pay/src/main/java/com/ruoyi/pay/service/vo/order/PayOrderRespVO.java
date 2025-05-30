@@ -1,5 +1,7 @@
 package com.ruoyi.pay.service.vo.order;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -14,6 +16,7 @@ import java.time.LocalDateTime;
 public class PayOrderRespVO extends PayOrderBaseVO {
 
   @Schema(description = "支付订单编号", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonSerialize(using = ToStringSerializer.class)
   private Long id;
 
   @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)

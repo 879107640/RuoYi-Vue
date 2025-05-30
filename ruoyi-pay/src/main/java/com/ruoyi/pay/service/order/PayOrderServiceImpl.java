@@ -13,6 +13,8 @@ import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.date.LocalDateTimeUtils;
 import com.ruoyi.common.utils.ip.IpUtils;
+import com.ruoyi.patent.domain.GPatentLibrary;
+import com.ruoyi.patent.mapper.GPatentLibraryMapper;
 import com.ruoyi.pay.config.core.client.PayClient;
 import com.ruoyi.pay.config.core.client.dto.order.PayOrderRespDTO;
 import com.ruoyi.pay.config.core.client.dto.order.PayOrderUnifiedReqDTO;
@@ -79,6 +81,8 @@ public class PayOrderServiceImpl implements PayOrderService {
   private PayNotifyService notifyService;
   @Resource
   PayPatentOrderMapper patentOrderMapper;
+  @Resource
+  GPatentLibraryMapper patentLibraryMapper;
 
 
   @Override
@@ -144,6 +148,17 @@ public class PayOrderServiceImpl implements PayOrderService {
 
   @Override
   public String createOrder(Long userId, PayOrderCreateReqVO createReqVO) {
+
+    GPatentLibrary gPatentLibrary = patentLibraryMapper.selectGPatentLibraryByNo(createReqVO.getPatentNo());
+
+    if (Objects.isNull(gPatentLibrary)) {
+      throw new ServiceException("专利信息不存在");
+    }
+
+    if (!gPatentLibrary.getBookerKey().equals(userId)) {
+      throw new ServiceException("该专利预定人为他人，暂不可查看信息");
+    }
+
     // 1.2 插入 demo 订单
     PayPatentOrderDO patentOrderDO = new PayPatentOrderDO();
     patentOrderDO.setUserId(userId);
@@ -408,10 +423,10 @@ public class PayOrderServiceImpl implements PayOrderService {
   }
 
   private void notifyOrderClosed(PayChannelDO channel, PayOrderRespDTO notify) {
-    updateOrderExtensionClosed(channel, notify);
+    updateOrderExtensionClosed(notify);
   }
 
-  private void updateOrderExtensionClosed(PayChannelDO channel, PayOrderRespDTO notify) {
+  private void updateOrderExtensionClosed(PayOrderRespDTO notify) {
     // 1. 查询 PayOrderExtensionDO
     PayOrderExtensionDO orderExtension = orderExtensionMapper.selectByNo(notify.getOutTradeNo());
     if (orderExtension == null) {

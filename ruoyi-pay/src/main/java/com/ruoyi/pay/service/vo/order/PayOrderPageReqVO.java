@@ -1,5 +1,7 @@
 package com.ruoyi.pay.service.vo.order;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.ruoyi.common.utils.PageParam;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -19,6 +21,7 @@ import static com.ruoyi.common.utils.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_M
 public class PayOrderPageReqVO extends PageParam {
 
   @Schema(description = "应用编号", example = "1024")
+  @JsonSerialize(using = ToStringSerializer.class)
   private Long appId;
 
   @Schema(description = "渠道编码", example = "wx_app")

@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.PageResult;
+import com.ruoyi.common.enums.UserTypeEnum;
 import com.ruoyi.common.enums.order.PayOrderStatusEnum;
 import com.ruoyi.common.utils.ip.IpUtils;
 import com.ruoyi.common.utils.object.BeanUtils;
@@ -90,7 +91,7 @@ public class PayOrderController extends BaseController {
       Map<String, String> channelExtras = reqVO.getChannelExtras() == null ?
           Maps.newHashMapWithExpectedSize(2) : reqVO.getChannelExtras();
       channelExtras.put(WalletPayClient.USER_ID_KEY, String.valueOf(getLoginUser().getUserId()));
-//            channelExtras.put(WalletPayClient.USER_TYPE_KEY, String.valueOf(getLoginUserType()));
+            channelExtras.put(WalletPayClient.USER_TYPE_KEY, String.valueOf(UserTypeEnum.MEMBER.getValue()));
       reqVO.setChannelExtras(channelExtras);
     }
 

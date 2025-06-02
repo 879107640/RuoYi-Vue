@@ -641,16 +641,13 @@ public class PayOrderServiceImpl implements PayOrderService {
       throw new ServiceException("当前专利号已被他人预定，您无权查看专利信息");
     }
 
-    PayPatentOrderDO patentOrderDO = patentOrderMapper.selectOne(new LambdaQueryWrapperX<PayPatentOrderDO>().eq(PayPatentOrderDO::getPatentNo, gPatentLibrary.getPatentNo()).eq(PayPatentOrderDO::getUserId, SecurityUtils.getUserId()));
+    PayPatentOrderDO patentOrderDO = patentOrderMapper.selectOne(new LambdaQueryWrapperX<PayPatentOrderDO>().eq(PayPatentOrderDO::getPatentNo, gPatentLibrary.getPatentNo()).eq(PayPatentOrderDO::getUserId, SecurityUtils.getUserId()).eq(PayPatentOrderDO::getPayStatus, true));
 
     if (Objects.isNull(patentOrderDO)) {
       return null;
     }
-    if (!patentOrderDO.getPayStatus()) {
-      throw new ServiceException("支付未完成。请完成支付后重试");
-    } else {
-      return userMapper.selectUserById(Long.valueOf(gPatentLibrary.getCreateBy()));
-    }
+
+    return userMapper.selectUserById(Long.valueOf(gPatentLibrary.getCreateBy()));
   }
 
   /**

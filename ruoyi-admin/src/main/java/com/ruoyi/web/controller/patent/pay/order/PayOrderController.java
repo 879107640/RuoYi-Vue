@@ -9,7 +9,6 @@ import com.ruoyi.common.enums.UserTypeEnum;
 import com.ruoyi.common.enums.order.PayOrderStatusEnum;
 import com.ruoyi.common.utils.ip.IpUtils;
 import com.ruoyi.common.utils.object.BeanUtils;
-import com.ruoyi.patent.service.IGPatentLibraryService;
 import com.ruoyi.pay.config.core.enums.channel.PayChannelEnum;
 import com.ruoyi.pay.convert.order.PayOrderConvert;
 import com.ruoyi.pay.domain.app.PayAppDO;
@@ -91,7 +90,7 @@ public class PayOrderController extends BaseController {
       Map<String, String> channelExtras = reqVO.getChannelExtras() == null ?
           Maps.newHashMapWithExpectedSize(2) : reqVO.getChannelExtras();
       channelExtras.put(WalletPayClient.USER_ID_KEY, String.valueOf(getLoginUser().getUserId()));
-            channelExtras.put(WalletPayClient.USER_TYPE_KEY, String.valueOf(UserTypeEnum.MEMBER.getValue()));
+      channelExtras.put(WalletPayClient.USER_TYPE_KEY, String.valueOf(UserTypeEnum.MEMBER.getValue()));
       reqVO.setChannelExtras(channelExtras);
     }
 

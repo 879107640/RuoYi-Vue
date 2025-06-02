@@ -36,7 +36,7 @@
                patent_type_key,
                patent_type_value, domain, fee_date, guidance_price, high_tech_reported_key, high_tech_reported_value,
                booker_time,
-            resource_provider, remark, status_key, status_value, booker_key, booker_value, days, deadline, create_time, update_time
+            resource_provider, remark, status_key, status_value, booker_key, booker_value, days, deadline, create_by, create_time, update_time
         from g_patent_library
     </sql>
 

@@ -2,6 +2,7 @@ package com.ruoyi.web.controller.patent.pay.order;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.google.common.collect.Maps;
+import com.ruoyi.common.annotation.Anonymous;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.PageResult;
@@ -122,7 +123,7 @@ public class PayOrderController extends BaseController {
 
   @PostMapping("/update-paid")
   @Operation(summary = "更新示例订单为已支付") // 由 pay-module 支付服务，进行回调，可见 PayNotifyJob
-  @PermitAll // 无需登录，安全由 PayDemoOrderService 内部校验实现
+  @Anonymous // 无需登录，安全由 PayDemoOrderService 内部校验实现
   public AjaxResult updateOrderPaid(@RequestBody PayOrderNotifyReqDTO notifyReqDTO) {
     orderService.updateOrderPaid(Long.valueOf(notifyReqDTO.getMerchantOrderId()),
         notifyReqDTO.getPayOrderId());

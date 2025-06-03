@@ -1,6 +1,7 @@
 package com.ruoyi.web.controller.patent.pay.notify;
 
 import cn.hutool.core.collection.CollUtil;
+import com.ruoyi.common.annotation.Anonymous;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.PageResult;
@@ -54,7 +55,7 @@ public class PayNotifyController extends BaseController {
 
     @PostMapping(value = "/order/{channelId}")
     @Operation(summary = "支付渠道的统一【支付】回调")
-    @PermitAll
+    @Anonymous
     public String notifyOrder(@PathVariable("channelId") Long channelId,
                               @RequestParam(required = false) Map<String, String> params,
                               @RequestBody(required = false) String body) {
@@ -74,7 +75,7 @@ public class PayNotifyController extends BaseController {
 
     @PostMapping(value = "/refund/{channelId}")
     @Operation(summary = "支付渠道的统一【退款】回调")
-    @PermitAll
+    @Anonymous
     public String notifyRefund(@PathVariable("channelId") Long channelId,
                                @RequestParam(required = false) Map<String, String> params,
                                @RequestBody(required = false) String body) {

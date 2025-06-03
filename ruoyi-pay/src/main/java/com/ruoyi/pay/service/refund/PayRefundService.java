@@ -4,6 +4,7 @@ package com.ruoyi.pay.service.refund;
 import com.ruoyi.pay.config.core.client.dto.refund.PayRefundRespDTO;
 import com.ruoyi.pay.domain.refund.PayRefundDO;
 import com.ruoyi.pay.service.dto.refund.PayRefundCreateReqDTO;
+import com.ruoyi.pay.service.refund.vo.AfterSaleCreateReqVO;
 
 /**
  * 退款订单 Service 接口
@@ -61,11 +62,8 @@ public interface PayRefundService {
 
   /**
    * 发起订单的退款
-   *
-   * @param id     编号
-   * @param userIp 用户编号
    */
-  void refundOrder(Long id, String userIp);
+  void refundOrder(AfterSaleCreateReqVO createReqVO, String userIp);
 
   /**
    * 更新订单为已退款

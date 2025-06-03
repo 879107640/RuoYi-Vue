@@ -11,21 +11,27 @@ import com.ruoyi.pay.config.core.client.PayClient;
 import com.ruoyi.pay.config.core.client.dto.refund.PayRefundRespDTO;
 import com.ruoyi.pay.config.core.client.dto.refund.PayRefundUnifiedReqDTO;
 import com.ruoyi.pay.config.core.enums.refund.PayRefundStatusRespEnum;
+import com.ruoyi.pay.convert.aftersale.AfterSaleConvert;
 import com.ruoyi.pay.convert.refund.PayRefundConvert;
+import com.ruoyi.pay.domain.aftersale.AfterSaleDO;
 import com.ruoyi.pay.domain.app.PayAppDO;
 import com.ruoyi.pay.domain.channel.PayChannelDO;
 import com.ruoyi.pay.domain.order.PayOrderDO;
 import com.ruoyi.pay.domain.order.PayPatentOrderDO;
 import com.ruoyi.pay.domain.refund.PayRefundDO;
 import com.ruoyi.pay.framework.pay.config.PayProperties;
+import com.ruoyi.pay.mapper.aftersale.AfterSaleMapper;
 import com.ruoyi.pay.mapper.order.PayPatentOrderMapper;
 import com.ruoyi.pay.mapper.refund.PayRefundMapper;
 import com.ruoyi.pay.redis.no.PayNoRedisDAO;
+import com.ruoyi.pay.service.aftersale.enums.AfterSaleStatusEnum;
+import com.ruoyi.pay.service.aftersale.enums.AfterSaleWayEnum;
 import com.ruoyi.pay.service.app.PayAppService;
 import com.ruoyi.pay.service.channel.PayChannelService;
 import com.ruoyi.pay.service.dto.refund.PayRefundCreateReqDTO;
 import com.ruoyi.pay.service.notify.PayNotifyService;
 import com.ruoyi.pay.service.order.PayOrderService;
+import com.ruoyi.pay.service.refund.vo.AfterSaleCreateReqVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -70,6 +76,8 @@ public class PayRefundServiceImpl implements PayRefundService {
   private PayChannelService channelService;
   @Resource
   private PayNotifyService notifyService;
+  @Resource
+  AfterSaleMapper afterSaleMapper;
 
   @Override
   public PayRefundDO getRefund(Long id) {
@@ -294,20 +302,34 @@ public class PayRefundServiceImpl implements PayRefundService {
     return count;
   }
 
-
   @Override
-  public void refundOrder(Long id, String userIp) {
+  @Transactional(rollbackFor = Exception.class)
+  public void refundOrder(AfterSaleCreateReqVO createReqVO, String userIp) {
     // 1. 校验订单是否可以退款
-    PayPatentOrderDO order = validateDemoOrderCanRefund(id);
+    PayPatentOrderDO order = validateDemoOrderCanRefund(createReqVO.getOrderId());
 
     PayRefundCreateReqDTO payRefundCreateReqDTO = getPayRefundCreateReqDTO(order);
+
+    createAfterSale(createReqVO, order.getPrice());
+
     Long payRefundId = createPayRefund(payRefundCreateReqDTO);// 价格信息
-    // 2.3 更新退款单到 demo 订单
+    // 2 更新退款单到 订单
     PayPatentOrderDO payPatentOrderDO = new PayPatentOrderDO();
-    payPatentOrderDO.setId(id);
+    payPatentOrderDO.setId(createReqVO.getOrderId());
     payPatentOrderDO.setPayRefundId(payRefundId);
     payPatentOrderDO.setRefundPrice(order.getPrice());
-    patentOrderMapper.updateById(new PayPatentOrderDO());
+    patentOrderMapper.updateById(payPatentOrderDO);
+  }
+
+  private void createAfterSale(AfterSaleCreateReqVO createReqVO, Integer refundPrice) {
+
+    // 创建售后单
+    AfterSaleDO afterSale = AfterSaleConvert.INSTANCE.convert(createReqVO);
+    afterSale.setNo(noRedisDAO.refundGenerate(PayNoRedisDAO.AFTER_SALE_NO_PREFIX));
+    afterSale.setStatus(AfterSaleStatusEnum.APPLY.getStatus());
+    afterSale.setWay(AfterSaleWayEnum.REFUND.getWay());
+    afterSale.setRefundPrice(refundPrice);
+    afterSaleMapper.insert(afterSale);
   }
 
   private static PayRefundCreateReqDTO getPayRefundCreateReqDTO(PayPatentOrderDO order) {
@@ -324,14 +346,20 @@ public class PayRefundServiceImpl implements PayRefundService {
   }
 
   @Override
+  @Transactional(rollbackFor = Exception.class)
   public void updateOrderRefunded(Long id, Long payRefundId) {
-// 1. 校验并获得退款订单（可退款）
+    // 1. 校验并获得退款订单（可退款）
     com.ruoyi.pay.service.dto.refund.PayRefundRespDTO payRefund = validateOrderCanRefunded(id, payRefundId);
-    // 2.2 更新退款单到 demo 订单
+    // 2 更新退款单到 订单
     PayPatentOrderDO payPatentOrderDO = new PayPatentOrderDO();
     payPatentOrderDO.setId(id);
     payPatentOrderDO.setRefundTime(payRefund.getSuccessTime());
     patentOrderMapper.updateById(payPatentOrderDO);
+    // 3. 更新售后服务单
+    AfterSaleDO afterSaleDO = new AfterSaleDO();
+    afterSaleDO.setOrderId(id);
+    afterSaleDO.setStatus(AfterSaleStatusEnum.COMPLETE.getStatus());
+    afterSaleMapper.updateByOrderIdAndStatus(id, afterSaleDO);
   }
 
   private com.ruoyi.pay.service.dto.refund.PayRefundRespDTO validateOrderCanRefunded(Long id, Long payRefundId) {

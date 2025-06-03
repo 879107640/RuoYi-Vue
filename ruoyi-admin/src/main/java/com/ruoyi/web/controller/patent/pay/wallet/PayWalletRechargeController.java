@@ -1,5 +1,6 @@
 package com.ruoyi.web.controller.patent.pay.wallet;
 
+import com.ruoyi.common.annotation.Anonymous;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.utils.ip.IpUtils;
@@ -29,7 +30,7 @@ public class PayWalletRechargeController extends BaseController {
 
   @PostMapping("/update-paid")
   @Operation(summary = "更新钱包充值为已充值") // 由 pay-module 支付服务，进行回调，可见 PayNotifyJob
-  @PermitAll // 无需登录， 内部校验实现
+  @Anonymous // 无需登录， 内部校验实现
   public AjaxResult updateWalletRechargerPaid(@Valid @RequestBody PayOrderNotifyReqDTO notifyReqDTO) {
     walletRechargeService.updateWalletRechargerPaid(Long.valueOf(notifyReqDTO.getMerchantOrderId()),
         notifyReqDTO.getPayOrderId());
@@ -47,7 +48,7 @@ public class PayWalletRechargeController extends BaseController {
 
   @PostMapping("/update-refunded")
   @Operation(summary = "更新钱包充值为已退款") // 由 pay-module 支付服务，进行回调，可见 PayNotifyJob
-  @PermitAll // 无需登录， 内部校验实现
+  @Anonymous // 无需登录， 内部校验实现
   public AjaxResult updateWalletRechargeRefunded(@RequestBody PayRefundNotifyReqDTO notifyReqDTO) {
     walletRechargeService.updateWalletRechargeRefunded(
         Long.valueOf(notifyReqDTO.getMerchantOrderId()), notifyReqDTO.getPayRefundId());

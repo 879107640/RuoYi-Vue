@@ -11,6 +11,7 @@ import com.ruoyi.pay.domain.order.PayOrderDO;
 import com.ruoyi.pay.domain.order.PayOrderExtensionDO;
 import com.ruoyi.pay.service.dto.PayOrderCreateReqDTO;
 import com.ruoyi.pay.service.vo.order.*;
+import com.ruoyi.system.service.vo.SysUserRespVo;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
@@ -176,6 +177,6 @@ public interface PayOrderService {
    */
   void updateOrderPaid(Long id, Long payOrderId);
 
-  SysUser getPatentInfo(String id) ;
+  SysUserRespVo getPatentInfo(String id) ;
 
 }

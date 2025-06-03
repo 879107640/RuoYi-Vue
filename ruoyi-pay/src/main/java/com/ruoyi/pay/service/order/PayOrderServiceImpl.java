@@ -39,6 +39,7 @@ import com.ruoyi.pay.service.notify.PayNotifyService;
 import com.ruoyi.pay.service.vo.order.*;
 import com.ruoyi.pay.util.number.MoneyUtils;
 import com.ruoyi.system.mapper.SysUserMapper;
+import com.ruoyi.system.service.vo.SysUserRespVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -125,6 +126,7 @@ public class PayOrderServiceImpl implements PayOrderService {
   }
 
   @Override
+  @Transactional(rollbackFor = Exception.class)
   public Long createPayOrder(PayOrderCreateReqDTO reqDTO) {
     // 校验 App
     PayAppDO app = appService.validPayApp(reqDTO.getAppKey());
@@ -318,7 +320,9 @@ public class PayOrderServiceImpl implements PayOrderService {
   @Override
   public void notifyOrder(Long channelId, PayOrderRespDTO notify) {
     // 校验支付渠道是否有效
+    PayChannelDO channel = channelService.validPayChannel(channelId);
     // 更新支付订单为已支付
+    getSelf().notifyOrder(channel, notify);
   }
 
   /**
@@ -627,7 +631,7 @@ public class PayOrderServiceImpl implements PayOrderService {
   }
 
   @Override
-  public SysUser getPatentInfo(String id) {
+  public SysUserRespVo getPatentInfo(String id) {
     GPatentLibrary gPatentLibrary = patentLibraryMapper.selectGPatentLibraryById(id);
     if (Objects.isNull(gPatentLibrary)) {
       throw new ServiceException("该专利号不存在");
@@ -641,13 +645,16 @@ public class PayOrderServiceImpl implements PayOrderService {
       throw new ServiceException("当前专利号已被他人预定，您无权查看专利信息");
     }
 
-    PayPatentOrderDO patentOrderDO = patentOrderMapper.selectOne(new LambdaQueryWrapperX<PayPatentOrderDO>().eq(PayPatentOrderDO::getPatentNo, gPatentLibrary.getPatentNo()).eq(PayPatentOrderDO::getUserId, SecurityUtils.getUserId()).eq(PayPatentOrderDO::getPayStatus, true));
+    PayPatentOrderDO patentOrderDO = patentOrderMapper.selectOne(new LambdaQueryWrapperX<PayPatentOrderDO>()
+        .eq(PayPatentOrderDO::getPatentNo, gPatentLibrary.getPatentNo())
+        .eq(PayPatentOrderDO::getUserId, SecurityUtils.getUserId())
+        .eq(PayPatentOrderDO::getPayStatus, true));
 
     if (Objects.isNull(patentOrderDO)) {
       return null;
     }
 
-    return userMapper.selectUserById(Long.valueOf(gPatentLibrary.getCreateBy()));
+    return userMapper.getUserById(Long.valueOf(gPatentLibrary.getCreateBy()));
   }
 
   /**

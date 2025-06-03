@@ -3,6 +3,8 @@ package com.ruoyi.system.mapper;
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.ruoyi.common.core.domain.entity.SysRole;
+import com.ruoyi.system.service.vo.SysUserRespVo;
 import org.apache.ibatis.annotations.Param;
 import com.ruoyi.common.core.domain.entity.SysUser;
 
@@ -51,6 +53,11 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
    * @return 用户对象信息
    */
   public SysUser selectUserById(Long userId);
+
+  /**
+   * 通过用户ID查询用户
+   */
+  SysUserRespVo getUserById(Long userId);
 
   /**
    * 新增用户信息

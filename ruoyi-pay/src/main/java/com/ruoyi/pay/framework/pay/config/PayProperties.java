@@ -15,7 +15,7 @@ public class PayProperties {
   private static final String ORDER_NO_PREFIX = "P";
   private static final String REFUND_NO_PREFIX = "R";
 
-  private static final String WALLET_PAY_APP_KEY_DEFAULT = "wallet";
+  private static final String WALLET_PAY_APP_KEY_DEFAULT = "patent";
 
   /**
    * 支付回调地址

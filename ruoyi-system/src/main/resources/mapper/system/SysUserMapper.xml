@@ -177,6 +177,10 @@
     where email = #{email}
       and del_flag = '0' limit 1
   </select>
+  <select id="getUserById" resultType="com.ruoyi.system.service.vo.SysUserRespVo">
+    select wx_code as wxCode, nick_name as nickName, phonenumber as phonenumber
+           from sys_user where user_id = #{userId}
+  </select>
 
   <insert id="insertUser" parameterType="SysUser" useGeneratedKeys="true" keyProperty="userId">
     insert into sys_user(

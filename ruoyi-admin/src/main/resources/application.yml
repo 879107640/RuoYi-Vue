@@ -168,7 +168,7 @@ yuanqi:
   info:
     base-package: com.ruoyi.pay
   pay:
-    order-notify-url: http://fe92de56.natappfree.cc/pay/notify/order # 支付渠道的【支付】回调地址
-    refund-notify-url: http://fe92de56.natappfree.cc/pay/notify/refund # 支付渠道的【退款】回调地址
-    transfer-notify-url: http://fe92de56.natappfree.cc/pay/notify/transfer # 支付渠道的【转账】回调地址
+    order-notify-url: http://pecbf48e.natappfree.cc/pay/notify/order # 支付渠道的【支付】回调地址
+    refund-notify-url: http://pecbf48e.natappfree.cc/pay/notify/refund # 支付渠道的【退款】回调地址
+    transfer-notify-url: http://pecbf48e.natappfree.cc/pay/notify/transfer # 支付渠道的【转账】回调地址
 

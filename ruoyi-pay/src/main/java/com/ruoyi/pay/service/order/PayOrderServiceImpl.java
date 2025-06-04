@@ -5,6 +5,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import com.google.common.annotations.VisibleForTesting;
+import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.page.PageResult;
 import com.ruoyi.common.enums.notify.PayNotifyTypeEnum;
 import com.ruoyi.common.enums.order.PayOrderStatusEnum;
@@ -13,6 +14,9 @@ import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.date.LocalDateTimeUtils;
 import com.ruoyi.common.utils.ip.IpUtils;
+import com.ruoyi.framework.mybatis.query.LambdaQueryWrapperX;
+import com.ruoyi.patent.domain.GPatentLibrary;
+import com.ruoyi.patent.mapper.GPatentLibraryMapper;
 import com.ruoyi.pay.config.core.client.PayClient;
 import com.ruoyi.pay.config.core.client.dto.order.PayOrderRespDTO;
 import com.ruoyi.pay.config.core.client.dto.order.PayOrderUnifiedReqDTO;
@@ -34,6 +38,8 @@ import com.ruoyi.pay.service.dto.PayOrderCreateReqDTO;
 import com.ruoyi.pay.service.notify.PayNotifyService;
 import com.ruoyi.pay.service.vo.order.*;
 import com.ruoyi.pay.util.number.MoneyUtils;
+import com.ruoyi.system.mapper.SysUserMapper;
+import com.ruoyi.system.service.vo.SysUserRespVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -79,6 +85,10 @@ public class PayOrderServiceImpl implements PayOrderService {
   private PayNotifyService notifyService;
   @Resource
   PayPatentOrderMapper patentOrderMapper;
+  @Resource
+  GPatentLibraryMapper patentLibraryMapper;
+  @Resource
+  SysUserMapper userMapper;
 
 
   @Override
@@ -116,6 +126,7 @@ public class PayOrderServiceImpl implements PayOrderService {
   }
 
   @Override
+  @Transactional(rollbackFor = Exception.class)
   public Long createPayOrder(PayOrderCreateReqDTO reqDTO) {
     // 校验 App
     PayAppDO app = appService.validPayApp(reqDTO.getAppKey());
@@ -144,6 +155,17 @@ public class PayOrderServiceImpl implements PayOrderService {
 
   @Override
   public String createOrder(Long userId, PayOrderCreateReqVO createReqVO) {
+
+    GPatentLibrary gPatentLibrary = patentLibraryMapper.selectGPatentLibraryByNo(createReqVO.getPatentNo());
+
+    if (Objects.isNull(gPatentLibrary)) {
+      throw new ServiceException("专利信息不存在");
+    }
+
+    if (!gPatentLibrary.getBookerKey().equals(userId)) {
+      throw new ServiceException("该专利预定人为他人，暂不可查看信息");
+    }
+
     // 1.2 插入 demo 订单
     PayPatentOrderDO patentOrderDO = new PayPatentOrderDO();
     patentOrderDO.setUserId(userId);
@@ -298,7 +320,9 @@ public class PayOrderServiceImpl implements PayOrderService {
   @Override
   public void notifyOrder(Long channelId, PayOrderRespDTO notify) {
     // 校验支付渠道是否有效
+    PayChannelDO channel = channelService.validPayChannel(channelId);
     // 更新支付订单为已支付
+    getSelf().notifyOrder(channel, notify);
   }
 
   /**
@@ -317,7 +341,7 @@ public class PayOrderServiceImpl implements PayOrderService {
     }
     // 情况二：支付失败的回调
     if (PayOrderStatusRespEnum.isClosed(notify.getStatus())) {
-      notifyOrderClosed(channel, notify);
+      notifyOrderClosed(notify);
     }
     // 情况三：WAITING：无需处理
     // 情况四：REFUND：通过退款回调处理
@@ -407,11 +431,11 @@ public class PayOrderServiceImpl implements PayOrderService {
     return false;
   }
 
-  private void notifyOrderClosed(PayChannelDO channel, PayOrderRespDTO notify) {
-    updateOrderExtensionClosed(channel, notify);
+  private void notifyOrderClosed(PayOrderRespDTO notify) {
+    updateOrderExtensionClosed(notify);
   }
 
-  private void updateOrderExtensionClosed(PayChannelDO channel, PayOrderRespDTO notify) {
+  private void updateOrderExtensionClosed(PayOrderRespDTO notify) {
     // 1. 查询 PayOrderExtensionDO
     PayOrderExtensionDO orderExtension = orderExtensionMapper.selectByNo(notify.getOutTradeNo());
     if (orderExtension == null) {
@@ -604,6 +628,33 @@ public class PayOrderServiceImpl implements PayOrderService {
     if (updateCount == 0) {
       throw new ServiceException("订单更新支付状态失败，订单不是【未支付】状态");
     }
+  }
+
+  @Override
+  public SysUserRespVo getPatentInfo(String id) {
+    GPatentLibrary gPatentLibrary = patentLibraryMapper.selectGPatentLibraryById(id);
+    if (Objects.isNull(gPatentLibrary)) {
+      throw new ServiceException("该专利号不存在");
+    }
+
+    if (gPatentLibrary.getBookerKey() == null) {
+      throw new ServiceException("当前专利暂无预定，无法查看联系人信息");
+    }
+
+    if (!Objects.equals(gPatentLibrary.getBookerKey(), SecurityUtils.getUserId())) {
+      throw new ServiceException("当前专利号已被他人预定，您无权查看专利信息");
+    }
+
+    PayPatentOrderDO patentOrderDO = patentOrderMapper.selectOne(new LambdaQueryWrapperX<PayPatentOrderDO>()
+        .eq(PayPatentOrderDO::getPatentNo, gPatentLibrary.getPatentNo())
+        .eq(PayPatentOrderDO::getUserId, SecurityUtils.getUserId())
+        .eq(PayPatentOrderDO::getPayStatus, true));
+
+    if (Objects.isNull(patentOrderDO)) {
+      return null;
+    }
+
+    return userMapper.getUserById(Long.valueOf(gPatentLibrary.getCreateBy()));
   }
 
   /**

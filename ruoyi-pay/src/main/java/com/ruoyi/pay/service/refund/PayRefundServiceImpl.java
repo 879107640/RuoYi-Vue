@@ -11,7 +11,6 @@ import com.ruoyi.pay.config.core.client.PayClient;
 import com.ruoyi.pay.config.core.client.dto.refund.PayRefundRespDTO;
 import com.ruoyi.pay.config.core.client.dto.refund.PayRefundUnifiedReqDTO;
 import com.ruoyi.pay.config.core.enums.refund.PayRefundStatusRespEnum;
-import com.ruoyi.pay.convert.aftersale.AfterSaleConvert;
 import com.ruoyi.pay.convert.refund.PayRefundConvert;
 import com.ruoyi.pay.domain.aftersale.AfterSaleDO;
 import com.ruoyi.pay.domain.app.PayAppDO;
@@ -31,7 +30,6 @@ import com.ruoyi.pay.service.channel.PayChannelService;
 import com.ruoyi.pay.service.dto.refund.PayRefundCreateReqDTO;
 import com.ruoyi.pay.service.notify.PayNotifyService;
 import com.ruoyi.pay.service.order.PayOrderService;
-import com.ruoyi.pay.service.refund.vo.AfterSaleCreateReqVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,6 +41,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static cn.hutool.core.util.ObjectUtil.notEqual;
+import static com.ruoyi.common.utils.SecurityUtils.getUserId;
 import static com.ruoyi.pay.util.json.JsonUtils.toJsonString;
 
 
@@ -304,31 +303,33 @@ public class PayRefundServiceImpl implements PayRefundService {
 
   @Override
   @Transactional(rollbackFor = Exception.class)
-  public void refundOrder(AfterSaleCreateReqVO createReqVO, String userIp) {
+  public void refundOrder(Long orderId, String userIp) {
     // 1. 校验订单是否可以退款
-    PayPatentOrderDO order = validateDemoOrderCanRefund(createReqVO.getOrderId());
+    PayPatentOrderDO order = validateDemoOrderCanRefund(orderId);
 
     PayRefundCreateReqDTO payRefundCreateReqDTO = getPayRefundCreateReqDTO(order);
 
-    createAfterSale(createReqVO, order.getPrice());
+    createAfterSale(orderId, order.getPrice());
 
     Long payRefundId = createPayRefund(payRefundCreateReqDTO);// 价格信息
     // 2 更新退款单到 订单
     PayPatentOrderDO payPatentOrderDO = new PayPatentOrderDO();
-    payPatentOrderDO.setId(createReqVO.getOrderId());
+    payPatentOrderDO.setId(orderId);
     payPatentOrderDO.setPayRefundId(payRefundId);
     payPatentOrderDO.setRefundPrice(order.getPrice());
     patentOrderMapper.updateById(payPatentOrderDO);
   }
 
-  private void createAfterSale(AfterSaleCreateReqVO createReqVO, Integer refundPrice) {
+  private void createAfterSale(Long orderId, Integer refundPrice) {
 
     // 创建售后单
-    AfterSaleDO afterSale = AfterSaleConvert.INSTANCE.convert(createReqVO);
+    AfterSaleDO afterSale = new AfterSaleDO();
     afterSale.setNo(noRedisDAO.refundGenerate(PayNoRedisDAO.AFTER_SALE_NO_PREFIX));
     afterSale.setStatus(AfterSaleStatusEnum.APPLY.getStatus());
     afterSale.setWay(AfterSaleWayEnum.REFUND.getWay());
     afterSale.setRefundPrice(refundPrice);
+    afterSale.setUserId(getUserId());
+    afterSale.setOrderId(orderId);
     afterSaleMapper.insert(afterSale);
   }
 

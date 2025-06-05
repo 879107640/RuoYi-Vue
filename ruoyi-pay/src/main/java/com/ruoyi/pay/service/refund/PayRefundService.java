@@ -63,7 +63,7 @@ public interface PayRefundService {
   /**
    * 发起订单的退款
    */
-  void refundOrder(AfterSaleCreateReqVO createReqVO, String userIp);
+  void refundOrder(Long orderId, String userIp);
 
   /**
    * 更新订单为已退款

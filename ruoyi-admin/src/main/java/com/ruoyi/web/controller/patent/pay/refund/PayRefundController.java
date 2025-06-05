@@ -49,10 +49,10 @@ public class PayRefundController extends BaseController {
     return success(PayRefundConvert.INSTANCE.convert(refund, app));
   }
 
-  @PutMapping("/refund")
+  @PutMapping("/refund/{orderId}")
   @Operation(summary = "发起订单的退款")
-  public AjaxResult refundOrder(@RequestBody AfterSaleCreateReqVO createReqVO) {
-    refundService.refundOrder(createReqVO, IpUtils.getIpAddr());
+  public AjaxResult refundOrder(@PathVariable("orderId") Long orderId) {
+    refundService.refundOrder(orderId, IpUtils.getIpAddr());
     return success(true);
   }
 

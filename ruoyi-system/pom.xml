@@ -22,7 +22,26 @@
       <groupId>com.ruoyi</groupId>
       <artifactId>ruoyi-common</artifactId>
     </dependency>
-
+    <dependency>
+      <groupId>com.aliyun</groupId>
+      <artifactId>dysmsapi20170525</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.aliyun</groupId>
+      <artifactId>tea-openapi</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.aliyun</groupId>
+      <artifactId>tea-console</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.aliyun</groupId>
+      <artifactId>tea-util</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.aliyun</groupId>
+      <artifactId>credentials-java</artifactId>
+    </dependency>
   </dependencies>
 
 </project>

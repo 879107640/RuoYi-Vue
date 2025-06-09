@@ -171,4 +171,10 @@ yuanqi:
     order-notify-url: http://pecbf48e.natappfree.cc/pay/notify/order # 支付渠道的【支付】回调地址
     refund-notify-url: http://pecbf48e.natappfree.cc/pay/notify/refund # 支付渠道的【退款】回调地址
     transfer-notify-url: http://pecbf48e.natappfree.cc/pay/notify/transfer # 支付渠道的【转账】回调地址
+  smsCode:
+    expireTimes: 10m
+    sendFrequency: 1m
+    sendMaximumQuantityPerDay: 10
+    beginCode: 9999 # 这里配置 9999 的原因是，测试方便。
+    endCode: 9999 # 这里配置 9999 的原因是，测试方便。
 

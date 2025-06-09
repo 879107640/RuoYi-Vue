@@ -59,3 +59,9 @@ spring:
         wall:
           config:
             multi-statement-allow: true
+
+
+yuanqi:
+  sms-config:
+    accessKeyId: LTAI5tSWz972qgATT8bvRfLr
+    accessKeySecret: YbG68uVMa6GrMcculNURcEmDdV5jXg

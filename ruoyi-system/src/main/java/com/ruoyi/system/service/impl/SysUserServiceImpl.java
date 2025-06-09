@@ -13,6 +13,7 @@ import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.aliyun.dysmsapi20170525.Client;
 import com.aliyun.dysmsapi20170525.models.SendSmsResponse;
+import com.aliyun.tea.NameInMap;
 import com.aliyun.teautil.models.RuntimeOptions;
 import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.common.utils.ip.IpUtils;
@@ -25,6 +26,7 @@ import com.ruoyi.system.service.vo.SysUserSaveReqVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -83,7 +85,10 @@ public class SysUserServiceImpl implements ISysUserService {
   RedisCache redisCache;
   @Resource
   SmsCodeMapper smsCodeMapper;
-
+  @Value("${yuanqi.sms-config.accessKeyId}")
+  private String accessKeyId;
+  @Value("${yuanqi.sms-config.accessKeyId}")
+  private String accessKeySecret;
   /**
    * 根据条件分页查询用户列表
    *
@@ -575,14 +580,14 @@ public class SysUserServiceImpl implements ISysUserService {
   }
 
 
-  public static com.aliyun.dysmsapi20170525.Client createClient() throws Exception {
+  public com.aliyun.dysmsapi20170525.Client createClient() throws Exception {
     com.aliyun.credentials.Client credential = new com.aliyun.credentials.Client();
     com.aliyun.teaopenapi.models.Config config = new com.aliyun.teaopenapi.models.Config()
         .setCredential(credential);
     // Endpoint 请参考 https://api.aliyun.com/product/Dysmsapi
     config.endpoint = "dysmsapi.aliyuncs.com";
-    config.setAccessKeyId("LTAI5tSWz972qgATT8bvRfLr");
-    config.setAccessKeySecret("YbG68uVMa6GrMcculNURcEmDdV5jXg");
+    config.setAccessKeyId(accessKeyId);
+    config.setAccessKeySecret(accessKeySecret);
     return new com.aliyun.dysmsapi20170525.Client(config);
   }
 

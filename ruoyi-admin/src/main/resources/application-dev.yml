@@ -59,3 +59,12 @@ spring:
         wall:
           config:
             multi-statement-allow: true
+
+
+yuanqi:
+  info:
+    base-package: com.ruoyi.pay
+  pay:
+    order-notify-url: https://244775go05sj.vicp.fun/pay/notify/order # 支付渠道的【支付】回调地址
+    refund-notify-url: https://244775go05sj.vicp.fun/pay/notify/refund # 支付渠道的【退款】回调地址
+    transfer-notify-url: https://244775go05sj.vicp.fun/.fun/pay/notify/transfer # 支付渠道的【转账】回调地址

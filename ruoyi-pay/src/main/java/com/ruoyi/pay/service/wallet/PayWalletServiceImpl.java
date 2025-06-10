@@ -280,7 +280,7 @@ public class PayWalletServiceImpl implements PayWalletService {
 
     // 2.1 创建支付单
     PayOrderCreateReqDTO payOrderCreateReqDTO = new PayOrderCreateReqDTO();
-    payOrderCreateReqDTO.setAppKey(payProperties.getWalletPayAppKey());
+    payOrderCreateReqDTO.setAppKey("wallet");
     payOrderCreateReqDTO.setUserIp(ipAddr);
     payOrderCreateReqDTO.setMerchantOrderId(recharge.getId().toString()); // 业务的订单编号
     payOrderCreateReqDTO.setSubject("钱包余额充值");

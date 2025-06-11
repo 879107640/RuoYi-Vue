@@ -73,10 +73,6 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
     List<GPatentLibrary> gPatentLibraries = gPatentLibraryMapper.selectGPatentLibraryList(gPatentLibrary);
     for (GPatentLibrary patentLibrary : gPatentLibraries) {
       GPatenLibraryLineUp gPatenLibraryLineUp = new GPatenLibraryLineUp();
-//      SysUser sysUser = userMapper.selectUserById(patentLibrary.getBookerKey());
-//      if (Objects.nonNull(sysUser)) {
-//        patentLibrary.setSoldUserName(sysUser.getNickName());
-//      }
       gPatenLibraryLineUp.setgPatentId(patentLibrary.getId());
       List<GPatenLibraryLineUp> gPatenLibraryLineUps = libraryLineUpMapper.selectGPatenLibraryLineUpList(gPatenLibraryLineUp);
       patentLibrary.setLineUpNum(gPatenLibraryLineUps.size());

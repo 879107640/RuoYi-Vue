@@ -65,3 +65,12 @@ yuanqi:
   sms-config:
     accessKeyId: LTAI5tSWz972qgATT8bvRfLr
     accessKeySecret: YbG68uVMa6GrMcculNURcEmDdV5jXg
+
+
+yuanqi:
+  info:
+    base-package: com.ruoyi.pay
+  pay:
+    order-notify-url: https://jianip.store/prod-api/pay/notify/order # 支付渠道的【支付】回调地址
+    refund-notify-url: https://jianip.store/prod-api/pay/notify/refund # 支付渠道的【退款】回调地址
+    transfer-notify-url: https://jianip.store/prod-api/pay/notify/transfer # 支付渠道的【转账】回调地址

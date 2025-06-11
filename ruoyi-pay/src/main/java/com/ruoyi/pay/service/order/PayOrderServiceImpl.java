@@ -5,7 +5,6 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import com.google.common.annotations.VisibleForTesting;
-import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.page.PageResult;
 import com.ruoyi.common.enums.notify.PayNotifyTypeEnum;
 import com.ruoyi.common.enums.order.PayOrderStatusEnum;
@@ -154,6 +153,7 @@ public class PayOrderServiceImpl implements PayOrderService {
   }
 
   @Override
+  @Transactional(rollbackFor = Exception.class)
   public String createOrder(Long userId, PayOrderCreateReqVO createReqVO) {
 
     GPatentLibrary gPatentLibrary = patentLibraryMapper.selectGPatentLibraryByNo(createReqVO.getPatentNo());
@@ -173,6 +173,7 @@ public class PayOrderServiceImpl implements PayOrderService {
     patentOrderDO.setPrice(1);
     patentOrderDO.setPayStatus(false);
     patentOrderDO.setRefundPrice(0);
+    patentOrderDO.setCreateBy(SecurityUtils.getUserId().toString());
     patentOrderMapper.insert(patentOrderDO);
 
     // 2.1 创建支付单

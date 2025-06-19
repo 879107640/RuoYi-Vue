@@ -37,6 +37,7 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -196,8 +197,9 @@ public class PayRefundServiceImpl implements PayRefundService {
   @Override
   public void notifyRefund(Long channelId, PayRefundRespDTO notify) {
     // 校验支付渠道是否有效
-//    PayChannelDO channel = channelService.validPayChannel(channelId);
+    PayChannelDO channel = channelService.validPayChannel(channelId);
     // 更新退款订单
+    getSelf().notifyRefund(channel, notify);
   }
 
   /**
@@ -317,6 +319,7 @@ public class PayRefundServiceImpl implements PayRefundService {
     payPatentOrderDO.setId(orderId);
     payPatentOrderDO.setPayRefundId(payRefundId);
     payPatentOrderDO.setRefundPrice(order.getPrice());
+    payPatentOrderDO.setRefundTime(LocalDateTime.now());
     patentOrderMapper.updateById(payPatentOrderDO);
   }
 
@@ -352,9 +355,10 @@ public class PayRefundServiceImpl implements PayRefundService {
     // 1. 校验并获得退款订单（可退款）
     com.ruoyi.pay.service.dto.refund.PayRefundRespDTO payRefund = validateOrderCanRefunded(id, payRefundId);
     // 2 更新退款单到 订单
-    PayPatentOrderDO payPatentOrderDO = new PayPatentOrderDO();
-    payPatentOrderDO.setId(id);
-    payPatentOrderDO.setRefundTime(payRefund.getSuccessTime());
+    PayPatentOrderDO payPatentOrderDO = patentOrderMapper.selectById(id);
+
+
+    payPatentOrderDO.setRefundTime(payRefund != null && payRefund.getSuccessTime() != null ? payRefund.getSuccessTime() : LocalDateTime.now());
     patentOrderMapper.updateById(payPatentOrderDO);
     // 3. 更新售后服务单
     AfterSaleDO afterSaleDO = new AfterSaleDO();
@@ -370,7 +374,7 @@ public class PayRefundServiceImpl implements PayRefundService {
       throw new ServiceException("订单不存在");
     }
     // 1.2 校验退款订单匹配
-    if (Objects.equals(order.getPayRefundId(), payRefundId)) {
+    if (!Objects.equals(order.getPayRefundId(), payRefundId)) {
       log.error("[validateDemoOrderCanRefunded][order({}) 退款单不匹配({})，请进行处理！order 数据是：{}]",
           id, payRefundId, toJsonString(order));
       throw new ServiceException("发起退款失败，退款单编号不匹配");

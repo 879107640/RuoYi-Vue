@@ -1,50 +1,49 @@
 package com.ruoyi.system.service.impl;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
-import javax.annotation.Resource;
-import javax.validation.Validator;
-
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.aliyun.dysmsapi20170525.Client;
 import com.aliyun.dysmsapi20170525.models.SendSmsResponse;
-import com.aliyun.tea.NameInMap;
 import com.aliyun.teautil.models.RuntimeOptions;
-import com.ruoyi.common.core.redis.RedisCache;
-import com.ruoyi.common.utils.ip.IpUtils;
-import com.ruoyi.common.utils.object.BeanUtils;
-import com.ruoyi.system.domain.SmsCodeDO;
-import com.ruoyi.system.framework.sms.config.SmsCodeProperties;
-import com.ruoyi.system.framework.sms.dto.SmsSendRespDTO;
-import com.ruoyi.system.mapper.*;
-import com.ruoyi.system.service.vo.SysUserSaveReqVO;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 import com.ruoyi.common.annotation.DataScope;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.common.exception.ServiceException;
+import com.ruoyi.common.utils.SecurityUtil;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.bean.BeanValidators;
+import com.ruoyi.common.utils.ip.IpUtils;
+import com.ruoyi.common.utils.object.BeanUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
-import com.ruoyi.system.domain.SysPost;
-import com.ruoyi.system.domain.SysUserPost;
-import com.ruoyi.system.domain.SysUserRole;
+import com.ruoyi.system.domain.*;
+import com.ruoyi.system.framework.sms.dto.SmsSendRespDTO;
+import com.ruoyi.system.mapper.*;
 import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.system.service.ISysDeptService;
 import com.ruoyi.system.service.ISysUserService;
+import com.ruoyi.system.service.vo.SysUserSaveReqVO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+
+import javax.annotation.Resource;
+import javax.validation.Validator;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static cn.hutool.core.util.RandomUtil.randomInt;
 
@@ -82,13 +81,13 @@ public class SysUserServiceImpl implements ISysUserService {
   protected Validator validator;
 
   @Resource
+  SysConfigMapper configMapper;
+
+  @Resource
   RedisCache redisCache;
   @Resource
   SmsCodeMapper smsCodeMapper;
-  @Value("${yuanqi.sms-config.accessKeyId}")
-  private String accessKeyId;
-  @Value("${yuanqi.sms-config.accessKeyId}")
-  private String accessKeySecret;
+
   /**
    * 根据条件分页查询用户列表
    *
@@ -532,9 +531,9 @@ public class SysUserServiceImpl implements ISysUserService {
     checkPhone(insetUser);
     checkUserName(insetUser);
     String smsCode = redisCache.getCacheObject(user.getPhonenumber());
-    if (Objects.isNull(smsCode) || !smsCode.equals(user.getSmsCode())) {
-      throw new ServiceException("验证码错误");
-    }
+//    if (Objects.isNull(smsCode) || !smsCode.equals(user.getSmsCode())) {
+//      throw new ServiceException("验证码错误");
+//    }
     insetUser.setPassword(SecurityUtils.encryptPassword(insetUser.getPassword()));
     return userMapper.insertUser(insetUser);
   }
@@ -548,20 +547,21 @@ public class SysUserServiceImpl implements ISysUserService {
 
     // 创建验证码
     String code = createSmsCode(mobile, IpUtils.getHostIp());
+
     // 发送验证码
     SmsSendRespDTO smsSendRespDTO = sendSingleSms(mobile, code);
+    redisCache.setCacheObject(mobile, code, 5 * 60, TimeUnit.SECONDS);
     return smsSendRespDTO.getSuccess();
   }
 
   public SmsSendRespDTO sendSingleSms(String mobile, String code) throws Exception {
-
 
     // 1. 执行请求
     Client client = createClient();
 
     com.aliyun.dysmsapi20170525.models.SendSmsRequest sendSmsRequest = new com.aliyun.dysmsapi20170525.models.SendSmsRequest()
         .setPhoneNumbers(mobile)
-        .setSignName("南昌元启知识产权服务")
+        .setSignName("南昌元启知识产权服务有限公司")
         .setTemplateParam("{\"code\":\"" + code + "\"}")
         .setTemplateCode("SMS_320265989");
     SendSmsResponse sendSmsResponse = client.sendSmsWithOptions(sendSmsRequest, new RuntimeOptions());
@@ -581,12 +581,21 @@ public class SysUserServiceImpl implements ISysUserService {
 
 
   public com.aliyun.dysmsapi20170525.Client createClient() throws Exception {
+    SysConfig sysConfig = new SysConfig();
+    sysConfig.setConfigKey("accessKeyId");
+
+    SysConfig selectConfig = configMapper.selectConfig(sysConfig);
+
     com.aliyun.credentials.Client credential = new com.aliyun.credentials.Client();
     com.aliyun.teaopenapi.models.Config config = new com.aliyun.teaopenapi.models.Config()
         .setCredential(credential);
     // Endpoint 请参考 https://api.aliyun.com/product/Dysmsapi
     config.endpoint = "dysmsapi.aliyuncs.com";
+    String accessKeyId = SecurityUtil.decryptAES(selectConfig.getConfigValue());
     config.setAccessKeyId(accessKeyId);
+    sysConfig.setConfigKey("accessKeySecret");
+    selectConfig = configMapper.selectConfig(sysConfig);
+    String accessKeySecret = SecurityUtil.decryptAES(selectConfig.getConfigValue());
     config.setAccessKeySecret(accessKeySecret);
     return new com.aliyun.dysmsapi20170525.Client(config);
   }
@@ -610,8 +619,6 @@ public class SysUserServiceImpl implements ISysUserService {
         .todayIndex(lastSmsCode != null && isToday(LocalDateTimeUtil.of(lastSmsCode.getCreateTime())) ? lastSmsCode.getTodayIndex() + 1 : 1)
         .createIp(ip).used(false).build();
     newSmsCode.setCreateTime(new Date());
-    newSmsCode.setCreateBy(SecurityUtils.getUserId().toString());
-    newSmsCode.setUpdateBy(SecurityUtils.getUserId().toString());
     newSmsCode.setUpdateTime(new Date());
     smsCodeMapper.insert(newSmsCode);
     return code;

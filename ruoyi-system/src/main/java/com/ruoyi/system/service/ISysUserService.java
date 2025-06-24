@@ -3,6 +3,7 @@ package com.ruoyi.system.service;
 import java.util.List;
 
 import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.system.service.vo.SysUserSaveReqVO;
 
 /**
  * 用户 业务层
@@ -203,4 +204,18 @@ public interface ISysUserService {
    * @return 结果
    */
   public String importUser(List<SysUser> userList, Boolean isUpdateSupport, String operName);
+
+  /**
+   * 注册用户
+   * @param user 新用户信息
+   * @return 新增条数
+   */
+  int register(SysUserSaveReqVO user);
+
+  /**
+   * 发送验证码
+   * @param mobile
+   * @return
+   */
+  Boolean sendCode(String mobile) throws Exception;
 }

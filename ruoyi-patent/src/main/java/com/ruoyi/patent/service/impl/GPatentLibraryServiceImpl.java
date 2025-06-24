@@ -93,10 +93,6 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
       }
 
       GPatenLibraryLineUp gPatenLibraryLineUp = new GPatenLibraryLineUp();
-//      SysUser sysUser = userMapper.selectUserById(patentLibrary.getBookerKey());
-//      if (Objects.nonNull(sysUser)) {
-//        patentLibrary.setSoldUserName(sysUser.getNickName());
-//      }
       gPatenLibraryLineUp.setgPatentId(patentLibrary.getId());
       List<GPatenLibraryLineUp> gPatenLibraryLineUps = libraryLineUpMapper.selectGPatenLibraryLineUpList(gPatenLibraryLineUp);
       patentLibrary.setLineUpNum(gPatenLibraryLineUps.size());
@@ -124,6 +120,9 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
   public int insertGPatentLibrary(GPatentLibrary gPatentLibrary) {
     gPatentLibrary.setCreateTime(DateUtils.getNowDate());
     gPatentLibrary.setId(UUID.randomUUID().toString());
+    gPatentLibrary.setCreateBy(SecurityUtils.getUsername());
+    gPatentLibrary.setUpdateBy(SecurityUtils.getUsername());
+    gPatentLibrary.setUpdateTime(DateUtils.getNowDate());
     GPatentLibrary isExit = gPatentLibraryMapper.selectGPatentLibraryByNo(gPatentLibrary.getPatentNo());
     if (Objects.nonNull(isExit)) {
       throw new ServiceException("该专利号已存在");
@@ -149,6 +148,7 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
       throw new ServiceException("已预订的专利不允许修改");
     }
     gPatentLibrary.setUpdateTime(DateUtils.getNowDate());
+    gPatentLibrary.setUpdateBy(SecurityUtils.getUserId().toString());
     return gPatentLibraryMapper.updateGPatentLibrary(gPatentLibrary);
   }
 
@@ -184,6 +184,8 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
       GPatentLibrary oldGPatentLibrary = gPatentLibraryMapper.selectGPatentLibraryByNo(gPatentLibrary.getPatentNo());
       if (Objects.nonNull(oldGPatentLibrary) && updateSupport) {
         gPatentLibrary.setId(oldGPatentLibrary.getId());
+        gPatentLibrary.setUpdateBy(SecurityUtils.getUserId().toString());
+        gPatentLibrary.setUpdateTime(DateUtils.getNowDate());
         gPatentLibraryMapper.updateGPatentLibrary(gPatentLibrary);
         continue;
       }
@@ -230,7 +232,6 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
       throw new ServiceException("无权取消当前专利预约");
     }
 
-
     GPatenLibraryLineUp libraryLineUp = new GPatenLibraryLineUp();
     libraryLineUp.setgPatentId(gPatentLibrary.getId());
     List<GPatenLibraryLineUp> gPatenLibraryLineUps = libraryLineUpMapper.selectGPatenLibraryLineUpList(libraryLineUp);
@@ -241,7 +242,6 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
 
     GPatenLibraryLineUp gPatenLibraryLineUp = gPatenLibraryLineUps.stream().min(Comparator.comparingLong(GPatenLibraryLineUp::getLineUpNum)).orElse(null);
     SysUser sysUser = userMapper.selectUserById(gPatenLibraryLineUp.getUserId());
-
 
     gPatentLibrary.setBookerKey(gPatenLibraryLineUp.getUserId());
     if (Objects.nonNull(sysUser) && Objects.nonNull(sysUser.getNickName())) {

@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletResponse;
 
+import com.ruoyi.common.annotation.Anonymous;
+import com.ruoyi.system.service.vo.SysUserSaveReqVO;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -129,6 +131,27 @@ public class SysUserController extends BaseController {
     user.setCreateBy(getUsername());
     user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
     return toAjax(userService.insertUser(user));
+  }
+
+  /**
+   * 新增用户
+   */
+  @Log(title = "用户管理", businessType = BusinessType.INSERT)
+  @PostMapping("/register")
+  @Anonymous
+  public AjaxResult register(@Validated @RequestBody SysUserSaveReqVO user) {
+
+    return toAjax(userService.register(user));
+  }
+
+  /**
+   * 新增用户
+   */
+  @PostMapping("/send-code/{mobile}")
+  @Anonymous
+  public AjaxResult sendCode(@PathVariable("mobile") String mobile) throws Exception {
+    Boolean flag = userService.sendCode(mobile);
+    return success(flag);
   }
 
   /**

@@ -37,7 +37,6 @@ public class PayWalletController extends BaseController {
   private PayWalletService payWalletService;
 
   @GetMapping("/get")
-  @PreAuthorize("@ss.hasPermi('pay:wallet:query')")
   @Operation(summary = "获得用户钱包明细")
   public AjaxResult getWallet(PayWalletUserReqVO reqVO) {
     PayWalletDO wallet = payWalletService.getOrCreateWallet(reqVO.getUserId(), MEMBER.getValue());
@@ -46,7 +45,6 @@ public class PayWalletController extends BaseController {
 
   @GetMapping("/page")
   @Operation(summary = "获得会员钱包分页")
-  @PreAuthorize("@ss.hasPermi('pay:wallet:query')")
   public AjaxResult getWalletPage(@Valid PayWalletPageReqVO pageVO) {
     PageResult<PayWalletDO> pageResult = payWalletService.getWalletPage(pageVO);
     return success(PayWalletConvert.INSTANCE.convertPage(pageResult));
@@ -54,7 +52,6 @@ public class PayWalletController extends BaseController {
 
   @PutMapping("/update-balance")
   @Operation(summary = "更新会员用户余额")
-  @PreAuthorize("@ss.hasPermi('pay:wallet:update-balance')")
   public AjaxResult updateWalletBalance(@Valid @RequestBody PayWalletUpdateBalanceReqVO updateReqVO) {
     // 获得用户钱包
     PayWalletDO wallet = payWalletService.getOrCreateWallet(updateReqVO.getUserId(), MEMBER.getValue());

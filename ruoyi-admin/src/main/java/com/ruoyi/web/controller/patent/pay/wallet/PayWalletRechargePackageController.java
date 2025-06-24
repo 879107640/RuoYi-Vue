@@ -32,14 +32,12 @@ public class PayWalletRechargePackageController extends BaseController {
 
     @PostMapping("/create")
     @Operation(summary = "创建钱包充值套餐")
-    @PreAuthorize("@ss.hasPermi('pay:wallet-recharge-package:create')")
     public AjaxResult createWalletRechargePackage(@Valid @RequestBody WalletRechargePackageCreateReqVO createReqVO) {
         return success(walletRechargePackageService.createWalletRechargePackage(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新钱包充值套餐")
-    @PreAuthorize("@ss.hasPermi('pay:wallet-recharge-package:update')")
     public AjaxResult updateWalletRechargePackage(@Valid @RequestBody WalletRechargePackageUpdateReqVO updateReqVO) {
         walletRechargePackageService.updateWalletRechargePackage(updateReqVO);
         return success(true);
@@ -48,7 +46,6 @@ public class PayWalletRechargePackageController extends BaseController {
     @DeleteMapping("/delete")
     @Operation(summary = "删除钱包充值套餐")
     @Parameter(name = "id", description = "编号", required = true)
-    @PreAuthorize("@ss.hasPermi('pay:wallet-recharge-package:delete')")
     public AjaxResult deleteWalletRechargePackage(@RequestParam("id") Long id) {
         walletRechargePackageService.deleteWalletRechargePackage(id);
         return success(true);
@@ -57,7 +54,6 @@ public class PayWalletRechargePackageController extends BaseController {
     @GetMapping("/get")
     @Operation(summary = "获得钱包充值套餐")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
-    @PreAuthorize("@ss.hasPermi('pay:wallet-recharge-package:query')")
     public AjaxResult getWalletRechargePackage(@RequestParam("id") Long id) {
         PayWalletRechargePackageDO walletRechargePackage = walletRechargePackageService.getWalletRechargePackage(id);
         return success(PayWalletRechargePackageConvert.INSTANCE.convert(walletRechargePackage));
@@ -65,7 +61,6 @@ public class PayWalletRechargePackageController extends BaseController {
 
     @GetMapping("/page")
     @Operation(summary = "获得钱包充值套餐分页")
-    @PreAuthorize("@ss.hasPermi('pay:wallet-recharge-package:query')")
     public AjaxResult getWalletRechargePackagePage(@Valid WalletRechargePackagePageReqVO pageVO) {
         PageResult<PayWalletRechargePackageDO> pageResult = walletRechargePackageService.getWalletRechargePackagePage(pageVO);
         return success(PayWalletRechargePackageConvert.INSTANCE.convertPage(pageResult));

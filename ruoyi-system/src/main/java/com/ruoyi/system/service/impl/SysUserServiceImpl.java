@@ -1,36 +1,51 @@
 package com.ruoyi.system.service.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-import javax.validation.Validator;
-
+import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.core.util.IdUtil;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
+import com.aliyun.dysmsapi20170525.Client;
+import com.aliyun.dysmsapi20170525.models.SendSmsResponse;
+import com.aliyun.teautil.models.RuntimeOptions;
+import com.ruoyi.common.annotation.DataScope;
+import com.ruoyi.common.constant.UserConstants;
+import com.ruoyi.common.core.domain.entity.SysRole;
+import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.common.core.redis.RedisCache;
+import com.ruoyi.common.exception.ServiceException;
+import com.ruoyi.common.utils.SecurityUtil;
+import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.utils.bean.BeanValidators;
+import com.ruoyi.common.utils.ip.IpUtils;
+import com.ruoyi.common.utils.object.BeanUtils;
+import com.ruoyi.common.utils.spring.SpringUtils;
+import com.ruoyi.system.domain.*;
+import com.ruoyi.system.framework.sms.dto.SmsSendRespDTO;
+import com.ruoyi.system.mapper.*;
+import com.ruoyi.system.service.ISysConfigService;
+import com.ruoyi.system.service.ISysDeptService;
+import com.ruoyi.system.service.ISysUserService;
+import com.ruoyi.system.service.vo.SysUserSaveReqVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import com.ruoyi.common.annotation.DataScope;
-import com.ruoyi.common.constant.UserConstants;
-import com.ruoyi.common.core.domain.entity.SysRole;
-import com.ruoyi.common.core.domain.entity.SysUser;
-import com.ruoyi.common.exception.ServiceException;
-import com.ruoyi.common.utils.SecurityUtils;
-import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.common.utils.bean.BeanValidators;
-import com.ruoyi.common.utils.spring.SpringUtils;
-import com.ruoyi.system.domain.SysPost;
-import com.ruoyi.system.domain.SysUserPost;
-import com.ruoyi.system.domain.SysUserRole;
-import com.ruoyi.system.mapper.SysPostMapper;
-import com.ruoyi.system.mapper.SysRoleMapper;
-import com.ruoyi.system.mapper.SysUserMapper;
-import com.ruoyi.system.mapper.SysUserPostMapper;
-import com.ruoyi.system.mapper.SysUserRoleMapper;
-import com.ruoyi.system.service.ISysConfigService;
-import com.ruoyi.system.service.ISysDeptService;
-import com.ruoyi.system.service.ISysUserService;
+
+import javax.annotation.Resource;
+import javax.validation.Validator;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+
+import static cn.hutool.core.util.RandomUtil.randomInt;
 
 /**
  * 用户 业务层处理
@@ -40,7 +55,7 @@ import com.ruoyi.system.service.ISysUserService;
 @Service
 public class SysUserServiceImpl implements ISysUserService {
   private static final Logger log = LoggerFactory.getLogger(SysUserServiceImpl.class);
-
+  private static final String RESPONSE_CODE_SUCCESS = "OK";
   @Autowired
   private SysUserMapper userMapper;
 
@@ -64,6 +79,14 @@ public class SysUserServiceImpl implements ISysUserService {
 
   @Autowired
   protected Validator validator;
+
+  @Resource
+  SysConfigMapper configMapper;
+
+  @Resource
+  RedisCache redisCache;
+  @Resource
+  SmsCodeMapper smsCodeMapper;
 
   /**
    * 根据条件分页查询用户列表
@@ -167,6 +190,13 @@ public class SysUserServiceImpl implements ISysUserService {
       return UserConstants.NOT_UNIQUE;
     }
     return UserConstants.UNIQUE;
+  }
+
+  public void checkUserName(SysUser user) {
+    SysUser info = userMapper.checkUserNameUnique(user.getUserName());
+    if (Objects.nonNull(info)) {
+      throw new ServiceException("新增用户'" + user.getUserName() + "'失败，登录账号已存在");
+    }
   }
 
   /**
@@ -474,10 +504,10 @@ public class SysUserServiceImpl implements ISysUserService {
           user.setUpdateBy(operName);
           userMapper.updateUser(user);
           successNum++;
-          successMsg.append("<br/>" + successNum + "、账号 " + user.getUserName() + " 更新成功");
+          successMsg.append("<br/>").append(successNum).append("、账号 ").append(user.getUserName()).append(" 更新成功");
         } else {
           failureNum++;
-          failureMsg.append("<br/>" + failureNum + "、账号 " + user.getUserName() + " 已存在");
+          failureMsg.append("<br/>").append(failureNum).append("、账号 ").append(user.getUserName()).append(" 已存在");
         }
       } catch (Exception e) {
         failureNum++;
@@ -493,5 +523,121 @@ public class SysUserServiceImpl implements ISysUserService {
       successMsg.insert(0, "恭喜您，数据已全部导入成功！共 " + successNum + " 条，数据如下：");
     }
     return successMsg.toString();
+  }
+
+  @Override
+  public int register(SysUserSaveReqVO user) {
+    SysUser insetUser = BeanUtils.toBean(user, SysUser.class);
+    checkPhone(insetUser);
+    checkUserName(insetUser);
+    String smsCode = redisCache.getCacheObject(user.getPhonenumber());
+//    if (Objects.isNull(smsCode) || !smsCode.equals(user.getSmsCode())) {
+//      throw new ServiceException("验证码错误");
+//    }
+    insetUser.setPassword(SecurityUtils.encryptPassword(insetUser.getPassword()));
+    return userMapper.insertUser(insetUser);
+  }
+
+  @Override
+  public Boolean sendCode(String mobile) throws Exception {
+
+    if (mobile == null || mobile.length() != 11) {
+      throw new ServiceException("手机号格式错误");
+    }
+
+    // 创建验证码
+    String code = createSmsCode(mobile, IpUtils.getHostIp());
+
+    // 发送验证码
+    SmsSendRespDTO smsSendRespDTO = sendSingleSms(mobile, code);
+    redisCache.setCacheObject(mobile, code, 5 * 60, TimeUnit.SECONDS);
+    return smsSendRespDTO.getSuccess();
+  }
+
+  public SmsSendRespDTO sendSingleSms(String mobile, String code) throws Exception {
+
+    // 1. 执行请求
+    Client client = createClient();
+
+    com.aliyun.dysmsapi20170525.models.SendSmsRequest sendSmsRequest = new com.aliyun.dysmsapi20170525.models.SendSmsRequest()
+        .setPhoneNumbers(mobile)
+        .setSignName("南昌元启知识产权服务有限公司")
+        .setTemplateParam("{\"code\":\"" + code + "\"}")
+        .setTemplateCode("SMS_320265989");
+    SendSmsResponse sendSmsResponse = client.sendSmsWithOptions(sendSmsRequest, new RuntimeOptions());
+
+    JSONObject response = JSONUtil.parseObj(sendSmsResponse);
+
+    // 2. 解析请求
+    SmsSendRespDTO smsSendRespDTO = new SmsSendRespDTO();
+    smsSendRespDTO.setSuccess(Objects.equals(response.getJSONObject("body").getStr("code"), RESPONSE_CODE_SUCCESS));
+    smsSendRespDTO.setSerialNo(response.getJSONObject("body").getStr("bizId"));
+    smsSendRespDTO.setApiRequestId(response.getJSONObject("body").getStr("requestId"));
+    smsSendRespDTO.setApiCode(response.getJSONObject("body").getStr("code"));
+    smsSendRespDTO.setApiMsg(response.getJSONObject("body").getStr("message"));
+
+    return smsSendRespDTO;
+  }
+
+
+  public com.aliyun.dysmsapi20170525.Client createClient() throws Exception {
+    SysConfig sysConfig = new SysConfig();
+    sysConfig.setConfigKey("accessKeyId");
+
+    SysConfig selectConfig = configMapper.selectConfig(sysConfig);
+
+    com.aliyun.credentials.Client credential = new com.aliyun.credentials.Client();
+    com.aliyun.teaopenapi.models.Config config = new com.aliyun.teaopenapi.models.Config()
+        .setCredential(credential);
+    // Endpoint 请参考 https://api.aliyun.com/product/Dysmsapi
+    config.endpoint = "dysmsapi.aliyuncs.com";
+    String accessKeyId = SecurityUtil.decryptAES(selectConfig.getConfigValue());
+    config.setAccessKeyId(accessKeyId);
+    sysConfig.setConfigKey("accessKeySecret");
+    selectConfig = configMapper.selectConfig(sysConfig);
+    String accessKeySecret = SecurityUtil.decryptAES(selectConfig.getConfigValue());
+    config.setAccessKeySecret(accessKeySecret);
+    return new com.aliyun.dysmsapi20170525.Client(config);
+  }
+
+  private String createSmsCode(String mobile, String ip) {
+
+    SmsCodeDO lastSmsCode = smsCodeMapper.selectLastByMobile(mobile);
+    if (lastSmsCode != null) {
+      if (LocalDateTimeUtil.between(LocalDateTimeUtil.of(lastSmsCode.getCreateTime()), LocalDateTime.now()).toMillis()
+          < Duration.ofMillis(10).toMillis()) { // 发送过于频繁
+        throw new ServiceException("短信发送过于频繁");
+      }
+      if (isToday(LocalDateTimeUtil.of(lastSmsCode.getCreateTime())) && // 必须是今天，才能计算超过当天的上限
+          lastSmsCode.getTodayIndex() >= 200) { // 超过当天发送的上限。
+        throw new ServiceException("超过每日短信发送数量");
+      }
+    }
+    // 创建验证码记录
+    String code = String.valueOf(randomInt(0, 9999));
+    SmsCodeDO newSmsCode = SmsCodeDO.builder().id(IdUtil.getSnowflakeNextId()).mobile(mobile).code(code)
+        .todayIndex(lastSmsCode != null && isToday(LocalDateTimeUtil.of(lastSmsCode.getCreateTime())) ? lastSmsCode.getTodayIndex() + 1 : 1)
+        .createIp(ip).used(false).build();
+    newSmsCode.setCreateTime(new Date());
+    newSmsCode.setUpdateTime(new Date());
+    smsCodeMapper.insert(newSmsCode);
+    return code;
+  }
+
+  public void checkPhone(SysUser user) {
+    SysUser info = userMapper.checkPhoneUnique(user.getPhonenumber());
+    if (Objects.nonNull(info)) {
+      throw new ServiceException("手机号码已存在");
+    }
+  }
+
+  /**
+   * 是否今天
+   *
+   * @param date 日期
+   * @return 是否
+   */
+  public static boolean isToday(LocalDateTime date) {
+    return LocalDateTimeUtil.isSameDay(date, LocalDateTime.now());
   }
 }

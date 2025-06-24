@@ -119,7 +119,7 @@ public class DataScopeAspect {
         sqlString.append(StringUtils.format(" OR {}.dept_id IN ( SELECT dept_id FROM sys_dept WHERE dept_id = {} or find_in_set( {} , ancestors ) )", deptAlias, user.getDeptId(), user.getDeptId()));
       } else if (DATA_SCOPE_SELF.equals(dataScope)) {
         if (StringUtils.isNotBlank(userAlias)) {
-          sqlString.append(StringUtils.format(" OR {}.user_id = {} ", userAlias, user.getUserId()));
+          sqlString.append(StringUtils.format(" OR {}.user_id = {} or {}.create_by = '{}'", userAlias, user.getUserId(), userAlias, user.getUserName()));
         } else {
           // 数据权限为仅本人且没有userAlias别名不查询任何数据
           sqlString.append(StringUtils.format(" OR {}.dept_id = 0 ", deptAlias));

@@ -37,6 +37,8 @@ import com.ruoyi.pay.service.dto.PayOrderCreateReqDTO;
 import com.ruoyi.pay.service.notify.PayNotifyService;
 import com.ruoyi.pay.service.vo.order.*;
 import com.ruoyi.pay.util.number.MoneyUtils;
+import com.ruoyi.system.domain.SysConfig;
+import com.ruoyi.system.mapper.SysConfigMapper;
 import com.ruoyi.system.mapper.SysUserMapper;
 import com.ruoyi.system.service.vo.SysUserRespVo;
 import lombok.extern.slf4j.Slf4j;
@@ -88,6 +90,8 @@ public class PayOrderServiceImpl implements PayOrderService {
   GPatentLibraryMapper patentLibraryMapper;
   @Resource
   SysUserMapper userMapper;
+  @Resource
+  SysConfigMapper configMapper;
 
 
   @Override
@@ -170,7 +174,10 @@ public class PayOrderServiceImpl implements PayOrderService {
     PayPatentOrderDO patentOrderDO = new PayPatentOrderDO();
     patentOrderDO.setUserId(userId);
     patentOrderDO.setPatentNo(createReqVO.getPatentNo());
-    patentOrderDO.setPrice(1);
+    SysConfig sysConfig = new SysConfig();
+    sysConfig.setConfigKey("getPatenInfoPrice");
+    SysConfig config = configMapper.selectConfig(sysConfig);
+    patentOrderDO.setPrice(Integer.valueOf(config.getConfigValue()));
     patentOrderDO.setPayStatus(false);
     patentOrderDO.setRefundPrice(0);
     patentOrderDO.setCreateBy(SecurityUtils.getUserId().toString());

@@ -3,6 +3,7 @@ package com.ruoyi.patent.domain;
 import java.math.BigDecimal;
 import java.util.Date;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ruoyi.common.core.domain.entity.BaseEntity;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -145,6 +146,12 @@ public class GPatentLibrary extends BaseEntity {
    * 出售时间
    */
   private Date soldTime;
+
+  /**
+   * 是否收藏 1：是 0：否
+   */
+  @TableField(exist = false)
+  private Integer favorite;
 
   public String getSoldUserName() {
     return soldUserName;
@@ -386,6 +393,14 @@ public class GPatentLibrary extends BaseEntity {
     this.bookerTime = bookerTime;
   }
 
+  public Integer getFavorite() {
+    return favorite;
+  }
+
+  public void setFavorite(Integer favorite) {
+    this.favorite = favorite;
+  }
+
   @Override
   public String toString() {
     return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
@@ -409,6 +424,7 @@ public class GPatentLibrary extends BaseEntity {
             .append("deadline", getDeadline())
             .append("createTime", getCreateTime())
             .append("updateTime", getUpdateTime())
+            .append("favorite", getFavorite())
             .toString();
   }
 }

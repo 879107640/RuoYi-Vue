@@ -8,11 +8,14 @@ import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.uuid.IdUtils;
 import com.ruoyi.common.utils.uuid.UUID;
 import com.ruoyi.patent.domain.GPatenLibraryLineUp;
+import com.ruoyi.patent.domain.GPatentFavorites;
 import com.ruoyi.patent.domain.GPatentLibrary;
 import com.ruoyi.patent.mapper.GPatenLibraryLineUpMapper;
+import com.ruoyi.patent.mapper.GPatentFavoritesMapper;
 import com.ruoyi.patent.mapper.GPatentLibraryMapper;
 import com.ruoyi.patent.service.IGPatentLibraryService;
 import com.ruoyi.patent.service.vo.GPatentLibrarySaveVo;
@@ -28,6 +31,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * 专利库数据Service业务层处理
@@ -47,6 +51,9 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
   SysUserMapper userMapper;
   @Resource
   SnowFlakeIdConfig snowFlakeIdConfig;
+
+  @Resource
+  GPatentFavoritesMapper gPatentFavoritesMapper;
 
 
   /**
@@ -71,7 +78,20 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
   public List<GPatentLibrary> selectGPatentLibraryList(GPatentLibrary gPatentLibrary) {
 
     List<GPatentLibrary> gPatentLibraries = gPatentLibraryMapper.selectGPatentLibraryList(gPatentLibrary);
+    // 获取所有的专利ID
+    List<String> patentIds = gPatentLibraries.stream().map(GPatentLibrary::getId).collect(Collectors.toList());
+    // 获取所有收藏的专利ID
+    String favoriteIds = "";
+    if (patentIds != null && patentIds.size() > 0) {
+      List<GPatentFavorites> gPatentFavorites = gPatentFavoritesMapper.selectByPatentIds(patentIds,SecurityUtils.getUserId());
+      favoriteIds = gPatentFavorites.stream().map(GPatentFavorites::getPatentId).collect(Collectors.joining(","));
+    }
+
     for (GPatentLibrary patentLibrary : gPatentLibraries) {
+      if (StringUtils.isNotEmpty(favoriteIds) && favoriteIds.contains(patentLibrary.getId())) {
+        patentLibrary.setFavorite(1);
+      }
+
       GPatenLibraryLineUp gPatenLibraryLineUp = new GPatenLibraryLineUp();
 //      SysUser sysUser = userMapper.selectUserById(patentLibrary.getBookerKey());
 //      if (Objects.nonNull(sysUser)) {
@@ -87,6 +107,9 @@ public class GPatentLibraryServiceImpl implements IGPatentLibraryService {
         }
       }
     }
+
+    gPatentLibraries.sort(Comparator.comparingInt((GPatentLibrary p) -> p.getFavorite() != null ? -p.getFavorite() : 0));
+
     return gPatentLibraries;
   }
 

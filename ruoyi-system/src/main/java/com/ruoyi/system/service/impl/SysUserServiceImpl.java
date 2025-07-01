@@ -531,9 +531,9 @@ public class SysUserServiceImpl implements ISysUserService {
     checkPhone(insetUser);
     checkUserName(insetUser);
     String smsCode = redisCache.getCacheObject(user.getPhonenumber());
-//    if (Objects.isNull(smsCode) || !smsCode.equals(user.getSmsCode())) {
-//      throw new ServiceException("验证码错误");
-//    }
+    if (Objects.isNull(smsCode) || !smsCode.equals(user.getSmsCode())) {
+      throw new ServiceException("验证码错误");
+    }
     insetUser.setPassword(SecurityUtils.encryptPassword(insetUser.getPassword()));
     return userMapper.insertUser(insetUser);
   }

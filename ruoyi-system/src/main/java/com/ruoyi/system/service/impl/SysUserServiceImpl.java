@@ -530,6 +530,7 @@ public class SysUserServiceImpl implements ISysUserService {
     SysUser insetUser = BeanUtils.toBean(user, SysUser.class);
     checkPhone(insetUser);
     checkUserName(insetUser);
+    checkPhoneUnique(insetUser);
     String smsCode = redisCache.getCacheObject(user.getPhonenumber());
     if (Objects.isNull(smsCode) || !smsCode.equals(user.getSmsCode())) {
       throw new ServiceException("验证码错误");
@@ -561,9 +562,9 @@ public class SysUserServiceImpl implements ISysUserService {
 
     com.aliyun.dysmsapi20170525.models.SendSmsRequest sendSmsRequest = new com.aliyun.dysmsapi20170525.models.SendSmsRequest()
         .setPhoneNumbers(mobile)
-        .setSignName("南昌元启知识产权服务有限公司")
+        .setSignName("元启知产")
         .setTemplateParam("{\"code\":\"" + code + "\"}")
-        .setTemplateCode("SMS_320265989");
+        .setTemplateCode("SMS_488665111");
     SendSmsResponse sendSmsResponse = client.sendSmsWithOptions(sendSmsRequest, new RuntimeOptions());
 
     JSONObject response = JSONUtil.parseObj(sendSmsResponse);
@@ -598,6 +599,10 @@ public class SysUserServiceImpl implements ISysUserService {
     String accessKeySecret = SecurityUtil.decryptAES(selectConfig.getConfigValue());
     config.setAccessKeySecret(accessKeySecret);
     return new com.aliyun.dysmsapi20170525.Client(config);
+  }
+
+  public static void main(String[] args) {
+    System.err.println(SecurityUtil.encryptAES("LTAI5tFbtpEcz2g5XQsGyngB"));
   }
 
   private String createSmsCode(String mobile, String ip) {
